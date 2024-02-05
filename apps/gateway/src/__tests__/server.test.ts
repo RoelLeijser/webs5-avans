@@ -13,10 +13,10 @@ describe("Server", () => {
 
   it("message endpoint says hello", async () => {
     await supertest(createServer())
-      .get("/message/jared")
+      .get("/message/world")
       .expect(200)
       .then((res) => {
-        expect(res.body).toEqual({ message: "hello jared" });
+        expect(res.body).toEqual({ message: "hello world" });
       });
   });
 });
