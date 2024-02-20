@@ -7,7 +7,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "dotenv-cli": "^7.3.0",
