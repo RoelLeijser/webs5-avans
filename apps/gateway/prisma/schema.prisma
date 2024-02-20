@@ -1,0 +1,20 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("AUTH_DB_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id       String    @id
+    sessions Session[]
+}
+
+model Session {
+    id        String   @id
+    userId    String
+    expiresAt DateTime
+    user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
