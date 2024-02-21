@@ -12,14 +12,16 @@
     "lint": "eslint src/",
     "test": "jest --detectOpenHandles",
     "preinstall": "npx only-allow pnpm",
-    "generate": "dotenv-cli prisma generate"
+    "db:push": "dotenv -e  ../../.env -- npx prisma db push",
+    "db:studio": "dotenv -e  ../../.env -- npx prisma studio"
   },
   "jest": {
     "preset": "@repo/jest-presets/jest/node"
   },
   "dependencies": {
     "@auth/express": "^0.5.0",
-    "@prisma/client": "^5.10.0",
+    "@auth/prisma-adapter": "^1.4.0",
+    "@prisma/client": "^5.10.2",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -32,14 +34,15 @@
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "@types/jest": "^29.5.11",
+    "@types/jest": "^29.5.12",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^20.10.6",
+    "@types/node": "^20.11.19",
     "@types/supertest": "^6.0.2",
     "dotenv-cli": "^7.3.0",
     "jest": "^29.7.0",
-    "supertest": "^6.3.3",
-    "tsup": "^8.0.1",
+    "prisma": "^5.10.2",
+    "supertest": "^6.3.4",
+    "tsup": "^8.0.2",
     "typescript": "^5.3.3"
   }
 }
