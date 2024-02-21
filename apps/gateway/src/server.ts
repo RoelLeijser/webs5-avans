@@ -1,5 +1,4 @@
-import { json, urlencoded } from "body-parser";
-import express, { type Express } from "express";
+import express, { type Express, json, urlencoded } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import { authRouter } from "./routes/auth";
@@ -18,7 +17,7 @@ export const createServer = (): Express => {
     .get("/status", (_, res) => {
       return res.json({ ok: true });
     })
-    .use("/auth", authRouter);
+    .use(authRouter);
 
   return app;
 };
