@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { env } from "../env";
 
 export const verifyToken = (
   req: Request,
@@ -12,10 +13,19 @@ export const verifyToken = (
     return res.status(401).json({ message: "Unauthorized: Missing token" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET!, (err: any, decoded: any) => {
-    if (err) {
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  jwt.verify(
+    token,
+    env.JWT_SECRET,
+    (
+      err: jwt.VerifyErrors | null,
+      decoded: string | jwt.JwtPayload | undefined
+    ) => {
+      if (err) {
+        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+      }
+
+      req.body.user = decoded;
+      next();
     }
-    next();
-  });
+  );
 };

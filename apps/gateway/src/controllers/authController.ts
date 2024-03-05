@@ -3,6 +3,7 @@ import z from "zod";
 import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { env } from "../env";
 
 const prisma = new PrismaClient();
 
@@ -29,13 +30,9 @@ export const authController = {
         return res.status(400).json({ error: "Invalid email or password" });
       }
 
-      if (process.env.JWT_SECRET === undefined) {
-        throw new Error("JWT_SECRET is not defined");
-      }
-
       const accessToken = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
+        env.JWT_SECRET,
         {
           expiresIn: "15m",
         }
@@ -45,7 +42,7 @@ export const authController = {
         {
           id: user.id,
         },
-        process.env.JWT_SECRET,
+        env.JWT_SECRET,
         {
           expiresIn: "7d",
         }
@@ -53,12 +50,12 @@ export const authController = {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       });
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
       });
 
@@ -115,11 +112,7 @@ export const authController = {
     try {
       const refreshToken = RefreshSchema.parse(req.cookies.refreshToken);
 
-      if (process.env.JWT_SECRET === undefined) {
-        throw new Error("JWT_SECRET is not defined");
-      }
-
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET, {});
+      const decoded = jwt.verify(refreshToken, env.JWT_SECRET, {});
 
       if (typeof decoded === "string") {
         throw new Error("Invalid token");
@@ -135,7 +128,7 @@ export const authController = {
 
       const accessToken = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
+        env.JWT_SECRET,
         {
           expiresIn: "15m",
         }
@@ -143,7 +136,7 @@ export const authController = {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
       });
 
