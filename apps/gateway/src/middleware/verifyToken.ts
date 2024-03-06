@@ -10,7 +10,9 @@ export const verifyToken = (
   const token = req.cookies.accessToken;
 
   if (!token && req.cookies.refreshToken) {
-    return res.status(401).json({ message: "Unauthorized: Missing token" });
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: Missing access token" });
   }
 
   jwt.verify(

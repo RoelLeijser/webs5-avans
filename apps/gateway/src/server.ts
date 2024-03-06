@@ -23,7 +23,12 @@ export const createServer = (): Express => {
     .get("/protected", verifyToken, (req, res) => {
       res.json({ message: "This is a secret message" });
     })
-    .use("/auth/", authRouter);
+    .use("/auth/", authRouter)
+    .use(verifyToken)
+    .use((req, _, next) => {
+      console.log("User", req.body.user);
+      next();
+    });
 
   return app;
 };

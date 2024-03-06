@@ -20,6 +20,8 @@
     "preset": "@repo/jest-presets/jest/node"
   },
   "dependencies": {
+    "@casl/ability": "^6.7.0",
+    "@casl/prisma": "^1.4.1",
     "@prisma/client": "^5.10.2",
     "@t3-oss/env-core": "^0.9.2",
     "@types/cookie-parser": "^1.4.7",
