@@ -31,7 +31,7 @@ export const authController = {
       }
 
       const accessToken = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, role: user.role },
         env.JWT_SECRET,
         {
           expiresIn: "15m",
@@ -127,7 +127,7 @@ export const authController = {
       }
 
       const accessToken = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, role: user.role },
         env.JWT_SECRET,
         {
           expiresIn: "15m",
