@@ -1,5 +1,5 @@
 {
-  "name": "@webs5/gateway",
+  "name": "@webs5/auth",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
     "test": "jest --detectOpenHandles",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "db:push": "dotenv -e  ../../.env -- npx prisma db push",
+    "db:studio": "dotenv -e  ../../.env -- npx prisma studio",
+    "db:generate": "dotenv -e  ../../.env -- npx prisma generate"
   },
   "jest": {
     "preset": "@repo/jest-presets/jest/node"

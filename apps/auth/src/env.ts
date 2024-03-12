@@ -3,11 +3,13 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    GATEWAY_PORT: z.string().optional().default("3000"),
+    AUTH_PORT: z.string().optional().default("3001"),
     JWT_SECRET: z.string(),
+    AUTH_DB_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
+    REDIS_URL: z.string().url(),
   },
 
   /**

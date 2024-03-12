@@ -1,7 +1,7 @@
 import { createServer } from "./server";
 import { env } from "./env";
 
-const port = env.GATEWAY_PORT;
+const port = env.AUTH_PORT;
 const server = createServer();
 
 server.listen(port, () => {

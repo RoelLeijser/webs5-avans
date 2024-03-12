@@ -1,0 +1,18 @@
+datasource db {
+    provider     = "mysql"
+    url          = env("AUTH_DB_URL")
+    relationMode = "prisma"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id        String   @id @default(uuid())
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    role      String   @default("user")
+}

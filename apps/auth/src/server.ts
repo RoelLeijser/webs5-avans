@@ -2,7 +2,8 @@ import express, { type Express, json, urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
-import { verifyToken } from "./middleware/isAuthenticated";
+import { authRouter } from "./routes/auth";
+import { verifyToken } from "./middleware/verifyToken";
 import { checkPermissions } from "./middleware/checkPermissions";
 
 export const createServer = (): Express => {
@@ -22,7 +23,9 @@ export const createServer = (): Express => {
     })
     .get("/protected", verifyToken, (req, res) => {
       res.json({ message: "This is a secret message" });
-    });
+    })
+    .use("/auth/", authRouter)
+    .use(verifyToken);
 
   return app;
 };
