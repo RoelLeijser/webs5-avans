@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { verifyToken } from "./middleware/isAuthenticated";
 import { checkPermissions } from "./middleware/checkPermissions";
+import proxy from "express-http-proxy";
 
 export const createServer = (): Express => {
   const app = express();
@@ -22,7 +23,8 @@ export const createServer = (): Express => {
     })
     .get("/protected", verifyToken, (req, res) => {
       res.json({ message: "This is a secret message" });
-    });
+    })
+    .post("/auth/*", proxy("http://localhost:3001"));
 
   return app;
 };
