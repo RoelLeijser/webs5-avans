@@ -15,9 +15,6 @@ export const createServer = (): Express => {
     .use(json())
     .use(cors())
     .use(cookieParser())
-    .get("/message/:name", (req, res) => {
-      return res.json({ message: `hello ${req.params.name}` });
-    })
     .get("/status", (_, res) => {
       return res.json({ ok: true });
     })
@@ -25,7 +22,9 @@ export const createServer = (): Express => {
       res.json({ message: "This is a secret message" });
     })
     .use("/auth/", authRouter)
-    .use(verifyToken);
+    .all("*", (req, res) => {
+      res.status(400).json({ error: `Path ${req.path} not found` });
+    });
 
   return app;
 };
