@@ -66,15 +66,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/config-eslint
-      '@repo/jest-presets':
-        specifier: workspace:*
-        version: link:../../packages/jest-presets
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/config-typescript
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
@@ -102,6 +93,15 @@ importers:
       '@types/supertest':
         specifier: ^6.0.2
         version: 6.0.2
+      '@webs5/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/config-eslint
+      '@webs5/jest-presets':
+        specifier: workspace:*
+        version: link:../../packages/jest-presets
+      '@webs5/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
       dotenv-cli:
         specifier: ^7.3.0
         version: 7.3.0
@@ -166,15 +166,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/config-eslint
-      '@repo/jest-presets':
-        specifier: workspace:*
-        version: link:../../packages/jest-presets
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/config-typescript
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
@@ -208,6 +199,15 @@ importers:
       '@types/supertest':
         specifier: ^6.0.2
         version: 6.0.2
+      '@webs5/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/config-eslint
+      '@webs5/jest-presets':
+        specifier: workspace:*
+        version: link:../../packages/jest-presets
+      '@webs5/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
       dotenv-cli:
         specifier: ^7.3.0
         version: 7.3.0
@@ -262,6 +262,8 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
+
+  packages/transactional: {}
 
 packages:
 

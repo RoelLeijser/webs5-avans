@@ -17,7 +17,7 @@
     "db:generate": "dotenv -e  ../../.env -- npx prisma generate"
   },
   "jest": {
-    "preset": "@repo/jest-presets/jest/node"
+    "preset": "@webs5/jest-presets/jest/node"
   },
   "dependencies": {
     "@casl/ability": "^6.7.0",
@@ -37,9 +37,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/jest-presets": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@webs5/eslint-config": "workspace:*",
+    "@webs5/jest-presets": "workspace:*",
+    "@webs5/typescript-config": "workspace:*",
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
