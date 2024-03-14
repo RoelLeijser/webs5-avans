@@ -1,0 +1,19 @@
+{
+  "name": "@webs5/mail",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "jest --detectOpenHandles",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.2"
+  }
+}
