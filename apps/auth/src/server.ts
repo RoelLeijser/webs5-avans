@@ -2,8 +2,9 @@ import express, { type Express, json, urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
-import { env } from "./env";
-import { requestWrapper } from "./requestWrapper";
+import { authRouter } from "./routes/auth";
+import { verifyToken } from "./middleware/verifyToken";
+import { checkPermissions } from "./middleware/checkPermissions";
 
 export const createServer = (): Express => {
   const app = express();
@@ -17,10 +18,13 @@ export const createServer = (): Express => {
     .get("/status", (_, res) => {
       return res.json({ ok: true });
     })
-    .all("/auth/*", requestWrapper(env.AUTH_URL))
+    .get("/protected", verifyToken, (req, res) => {
+      res.json({ message: "This is a secret message" });
+    })
+    .use("/auth/", authRouter)
     .all("*", (req, res) => {
-      res.status(404).json({ error: `Path ${req.path} not found` });
-    }); // this route match should be last
+      res.status(400).json({ error: `Path ${req.path} not found` });
+    });
 
   return app;
 };

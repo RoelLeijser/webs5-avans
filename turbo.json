@@ -5,7 +5,6 @@
   "globalDotEnv": [".env"],
   "pipeline": {
     "build": {
-      // "outputs" are defined in Workspace Configurations: https://turbo.build/repo/docs/core-concepts/monorepos/configuring-workspaces
       "dependsOn": ["^build"]
     },
     "test": {
