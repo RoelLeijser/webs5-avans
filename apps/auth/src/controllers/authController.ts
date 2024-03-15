@@ -4,6 +4,7 @@ import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { env } from "../env";
+import { pub } from "../rabbitmq";
 
 const prisma = new PrismaClient();
 
@@ -85,12 +86,19 @@ export const authController = {
 
       const hashedPassword = await argon2.hash(password);
 
-      await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        },
-      });
+      await prisma.user
+        .create({
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        })
+        .then(async (user) => {
+          await pub.send(
+            { exchange: "my-events", routingKey: "users.register" },
+            { user }
+          );
+        });
 
       return res.status(201).json({
         message: "User registered successfully",
