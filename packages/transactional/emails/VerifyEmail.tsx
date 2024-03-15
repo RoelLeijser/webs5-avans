@@ -9,7 +9,6 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import * as React from "react";
 
 type VerifyEmailProps = {
   url: string;
@@ -33,19 +32,19 @@ export const VerifyEmail = ({ url }: VerifyEmailProps) => {
 
       <Preview>pRESTige Email Verification</Preview>
       <Body>
-        <Tailwind>
-          <Container className="bg-slate-100 p-5 rounded-md my-auto">
-            <Text>
-              Please verify your email address by clicking the link below.
-            </Text>
-            <Button
-              href={url}
-              className="bg-black px-3 py-2 font-medium leading-4 text-white rounded-md"
-            >
-              Verify email
-            </Button>
-          </Container>
-        </Tailwind>
+        {/* <Tailwind> */}
+        <Container className="bg-slate-100 p-5 rounded-md my-auto">
+          <Text>
+            Please verify your email address by clicking the link below.
+          </Text>
+          <Button
+            href={url}
+            className="bg-black px-3 py-2 font-medium leading-4 text-white rounded-md"
+          >
+            Verify email
+          </Button>
+        </Container>
+        {/* </Tailwind> */}
       </Body>
     </Html>
   );

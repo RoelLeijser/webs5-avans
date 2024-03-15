@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "React Library",
+  "display": "React Email Library",
   "extends": "./base.json",
   "compilerOptions": {
     "lib": ["ES2015"],
@@ -8,5 +8,5 @@
     "target": "ES6",
     "jsx": "react-jsx",
     "noEmit": true
-  }
+  },
 }

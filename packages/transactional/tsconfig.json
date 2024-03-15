@@ -1,0 +1,10 @@
+{
+  "extends": "@webs5/typescript-config/react-library.json",
+  "moduleResolution": "node",
+  "compilerOptions": {
+    "lib": ["dom", "ES2015"],
+    "types": ["jest", "node"]
+  },
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}
