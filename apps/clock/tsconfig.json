@@ -1,0 +1,18 @@
+{
+    "extends": "@repo/typescript-config/base.json",
+    "compilerOptions": {
+      "lib": ["ES2015"],
+      "module": "ES2015",
+      "outDir": "./dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "target": "esnext",
+      "moduleResolution": "Node",
+      "strictPropertyInitialization": false,
+    },
+    "exclude": ["node_modules"],
+    "include": ["."]
+  }
+  
