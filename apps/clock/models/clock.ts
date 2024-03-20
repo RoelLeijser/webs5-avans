@@ -1,47 +1,41 @@
-import { DocumentType, getModelForClass, prop } from '@typegoose/typegoose';
-import * as mongoose from 'mongoose';
+import { DocumentType, getModelForClass, prop } from "@typegoose/typegoose";
+import * as mongoose from "mongoose";
 
 class Clock {
-    //generate date field
-    @prop({ required: true })
-    target_id: string;
-    @prop({ required: true })
-    end_date: Date;
+  //generate date field
+  @prop({ type: () => String, required: true })
+  target_id: string;
+
+  @prop({ required: true })
+  end_date: Date;
 }
 
 async function createModel(target: string, date: Date) {
-    const clock = getModelForClass(Clock);
-    await clock.create({target_id: target, end_date: date}, (err: Error, doc: any) => {
-        if (err) {
-            console.error(err);
-        }
-        console.log(doc);
-    });
+  const clock = getModelForClass(Clock);
+  await clock.create({ target_id: target, end_date: date });
+  console.log("Model created");
 }
 
-async function getModelById(target_id: string): Promise<Clock | null>{
-    const clock = getModelForClass(Clock);
-    const result = clock.find({target_id}, (err: Error, doc: any) => {
-        if (err) {
-            console.error(err);
-        }
-        console.log(doc);
-        return doc;
-    });
-
-    return null;
+async function updateModel(target: string, date: Date) {
+  const clock = getModelForClass(Clock);
+  await clock.updateOne({ target_id: target }, { end_date: date });
 }
 
-async function getAllModels(): Promise<Clock[] | null> {
-    const clock = getModelForClass(Clock);
-    const result = clock.find({}, (err: Error, doc: Clock[]) => {
-        if (err) {
-            console.error(err);
-        }
-        console.log(doc);
-        return doc;
-    });
-    return null;
+async function getModelById(target_id: string) {
+  const clock = getModelForClass(Clock);
+  const result = clock.find({ target_id });
+  return result;
 }
 
-export { createModel, getModelById, getAllModels };
+async function getAllModels() {
+  const clock = getModelForClass(Clock);
+  const result = await clock.find({});
+  return result;
+}
+
+async function deleteModel(target_id: string) {
+  const clock = getModelForClass(Clock);
+  await clock.deleteOne({ target_id });
+}
+
+export { createModel, getModelById, getAllModels, deleteModel, updateModel };

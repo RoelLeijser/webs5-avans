@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   rabbitmq:
@@ -12,16 +12,13 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   mongodb:
-    image: prismagraphql/mongo-single-replica:5.0.3
+    image: mongo:latest
     container_name: mongodb
     restart: always
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
 
   redis:
     image: redis:latest
