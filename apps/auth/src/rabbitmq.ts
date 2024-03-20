@@ -1,7 +1,8 @@
 import { Connection } from "rabbitmq-client";
+import { env } from "./env";
 
 // Initialize:
-const rabbit = new Connection("amqp://guest:guest@localhost:5672");
+const rabbit = new Connection(env.RABBITMQ_URL);
 rabbit.on("error", (err) => {
   console.log("RabbitMQ connection error", err);
 });

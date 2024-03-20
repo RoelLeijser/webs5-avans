@@ -10,6 +10,7 @@ export const env = createEnv({
       .enum(["development", "production", "test"])
       .default("development"),
     REDIS_URL: z.string().url(),
+    RABBITMQ_URL: z.string().url(),
   },
 
   /**
