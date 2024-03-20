@@ -15,5 +15,5 @@ export const pub = rabbit.createPublisher({
   // Enable retries
   maxAttempts: 2,
   // Optionally ensure the existence of an exchange before we use it
-  exchanges: [{ exchange: "my-events", type: "topic" }],
+  exchanges: [{ exchange: "user.events", type: "topic" }],
 });

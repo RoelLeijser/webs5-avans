@@ -233,7 +233,7 @@ importers:
   apps/mail:
     dependencies:
       '@t3-oss/env-core':
-        specifier: ^0.9.1
+        specifier: ^0.9.2
         version: 0.9.2(typescript@5.4.2)(zod@3.22.4)
       '@webs5/transactional':
         specifier: workspace:*
