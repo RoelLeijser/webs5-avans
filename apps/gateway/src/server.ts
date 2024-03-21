@@ -18,6 +18,7 @@ export const createServer = (): Express => {
       return res.json({ ok: true });
     })
     .all("/auth/*", requestWrapper(env.AUTH_URL))
+    .all("/target/*", requestWrapper(env.TARGET_URL))
     .all("*", (req, res) => {
       res.status(404).json({ error: `Path ${req.path} not found` });
     }); // this route match should be last

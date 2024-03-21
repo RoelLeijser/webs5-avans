@@ -1,4 +1,4 @@
-import { Request, Response, query } from "express";
+import { Request, Response } from "express";
 import z from "zod";
 import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";

@@ -13,7 +13,6 @@
     "lint": "eslint src/",
     "test": "jest --detectOpenHandles",
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "prisma generate",
     "db:push": "dotenv -e  ../../.env -- npx prisma db push",
     "db:studio": "dotenv -e  ../../.env -- npx prisma studio",
     "db:generate": "dotenv -e  ../../.env -- npx prisma generate"

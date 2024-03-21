@@ -3,13 +3,11 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    GATEWAY_URL: z.string().url(),
-    AUTH_URL: z.string().url(),
     TARGET_URL: z.string().url(),
-    JWT_SECRET: z.string(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
+    RABBITMQ_URL: z.string().url(),
   },
 
   /**
