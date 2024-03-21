@@ -6,8 +6,6 @@
       "outDir": "./dist",
       "strict": true,
       "esModuleInterop": true,
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true,
       "target": "esnext",
       "moduleResolution": "Node",
       "strictPropertyInitialization": false,

@@ -1,25 +1,9 @@
-import {
-  createModel,
-  deleteModel,
-  getAllModels,
-  updateModel,
-} from "../models/clock";
 import { Connection } from "rabbitmq-client";
-import { Agenda } from "@hokify/agenda";
-
-console.log("clockservice has started...");
-
-//connect to mongoose
-import mongoose, { model } from "mongoose";
-mongoose.connect("mongodb://localhost:27017/clock");
-
-const rabbit = new Connection("amqp://guest:guest@localhost:5672");
-rabbit.on("error", (err) => {
-  console.log("RabbitMQ connection error", err);
-});
-rabbit.on("connection", () => {
-  console.log("Connection successfully (re)established");
-});
+import "node:crypto";
+import Queue from "bull";
+import { clockQueue } from "./bullsetup";
+import { addClock, updateClock, deleteClock } from "./clockjobs";
+import { rabbit } from "./rabbitmq";
 
 const expiredPub = rabbit.createPublisher({
   confirm: true,
@@ -27,21 +11,12 @@ const expiredPub = rabbit.createPublisher({
   exchanges: [{ exchange: "target-events", type: "topic" }],
 });
 
-const agenda = new Agenda({
-  db: {
-    address: "mongodb://localhost:27017/agenda",
-  },
-});
-
-agenda.start();
-
-//when the clock expires, send a message to the target service
-agenda.define("expired clock", async (job) => {
-  console.log("Deleting clock", job.attrs.data.target_id);
-  await expiredPub.send(
-    { exchange: "target-events", routingKey: "target.expired" }, // metadata
-    { target_id: job.attrs.data.target_id }
-  ); // message content
+clockQueue.process(async (job, done) => {
+  console.log("Job completed", job.data.target_id);
+  await expiredPub.send("target.expired", {
+    target_id: job.data.target_id,
+  });
+  done();
 });
 
 //for creating a new model
@@ -59,10 +34,9 @@ const sub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log("received message", msg);
-    const job = await agenda.schedule(msg.body.date, "expired clock", msg.body);
-    await job.save();
-    console.log("message processed");
+    //create agenda job
+    console.log("Creating clock", msg.body.target_id);
+    await addClock(msg.body.target_id, new Date(msg.body.date));
   }
 );
 
@@ -81,12 +55,9 @@ const updateSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log("received message", msg);
     //update agenda job
-    const job = await agenda.jobs({ "data.target_id": msg.body.target_id });
-    job[0].schedule(msg.body.date);
-    await job[0].save();
-    console.log("message processed");
+    console.log("Updating clock", msg.body.target_id);
+    await updateClock(msg.body.target_id, new Date(msg.body.date));
   }
 );
 
@@ -94,21 +65,25 @@ updateSub.on("error", (err) => {
   console.log("consumer error (user-events)", err);
 });
 
-(async () =>
-  await expiredPub
-    .send(
-      { exchange: "target-events", routingKey: "target.created" },
-      { target_id: "1234", date: Date.now() + 10000 }
-    )
-    .then(() => {
-      console.log("Message sent");
-    }))();
+const deleteSub = rabbit.createConsumer(
+  {
+    queue: "target.deleted",
+    queueOptions: { durable: true },
+    qos: { prefetchCount: 2 },
+    exchanges: [{ exchange: "target-events", type: "topic" }],
+    queueBindings: [
+      { exchange: "target-events", routingKey: "target.deleted" },
+    ],
+  },
+  async (msg) => {
+    //delete agenda job
+    console.log("Deleting clock", msg.body.target_id);
+    await deleteClock(msg.body.target_id);
+  }
+);
 
-expiredPub
-  .send(
-    { exchange: "target-events", routingKey: "target.updated" },
-    { target_id: "1234", date: Date.now() + 30000 }
-  )
-  .then(() => {
-    console.log("Update message send");
-  });
+deleteSub.on("error", (err) => {
+  console.log("consumer error (user-events)", err);
+});
+
+console.log("Clockservice running.");
