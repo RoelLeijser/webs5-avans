@@ -10,7 +10,7 @@ type Event = z.infer<typeof RegisterSchema>;
 
 export async function sendVerificationEmail(event: Event) {
   const { data, error } = await resend.emails.send({
-    from: "Photo pRESTiges <onboarding@resend.dev>",
+    from: "Photo pRESTiges <noreply@silly.media>",
     to: [event.user.email],
     subject: "Photo pRESTiges email verification",
     react: VerifyEmail({
@@ -18,7 +18,7 @@ export async function sendVerificationEmail(event: Event) {
     }),
   });
   if (error) {
-    throw new Error("Failed to send verification email");
+    throw new Error(error.message);
   } else if (data) {
     console.log(data);
   }
