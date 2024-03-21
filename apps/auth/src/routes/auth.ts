@@ -14,3 +14,7 @@ authRouter.post("/register", async (req, res) => {
 authRouter.post("/refresh", async (req, res) => {
   return await authController.refresh(req, res);
 });
+
+authRouter.get("/verify", async (req, res) => {
+  return await authController.verify(req, res);
+});

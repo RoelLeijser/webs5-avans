@@ -1,9 +1,11 @@
-import { Request, Response } from "express";
+import { Request, Response, query } from "express";
 import z from "zod";
 import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { env } from "../env";
+import { pub } from "../rabbitmq";
+import crypto from "node:crypto";
 
 const prisma = new PrismaClient();
 
@@ -19,12 +21,20 @@ const LoginSchema = z.object({
 
 const RefreshSchema = z.string();
 
+const VerifySchema = z.object({
+  token: z.string(),
+});
+
 export const authController = {
   async login(req: Request, res: Response) {
     try {
       const { email, password } = LoginSchema.parse(req.body);
 
       const user = await prisma.user.findUnique({ where: { email } });
+
+      if (user?.isVerified === false) {
+        return res.status(400).json({ error: "User not verified" });
+      }
 
       if (!user || !(await argon2.verify(user.password, password))) {
         return res.status(400).json({ error: "Invalid email or password" });
@@ -85,12 +95,30 @@ export const authController = {
 
       const hashedPassword = await argon2.hash(password);
 
-      await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        },
-      });
+      await prisma.user
+        .create({
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        })
+        .then(async (user) => {
+          const verificationToken = await prisma.verificationToken.create({
+            data: {
+              identifier: user.id,
+              token: crypto.randomBytes(64).toString("hex"),
+              expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours
+            },
+          });
+
+          return { user, verificationToken };
+        })
+        .then(async ({ user, verificationToken }) => {
+          await pub.send(
+            { exchange: "user.events", routingKey: "users.register" },
+            { user, verificationToken }
+          );
+        });
 
       return res.status(201).json({
         message: "User registered successfully",
@@ -102,7 +130,7 @@ export const authController = {
           .json({ error: "Validation failed", details: error.errors });
       } else {
         res.status(500).json({
-          error: "Internal server error",
+          error: error,
         });
       }
     }
@@ -151,6 +179,41 @@ export const authController = {
           error: "Internal server error",
         });
       }
+    }
+  },
+
+  async verify(req: Request, res: Response) {
+    try {
+      const { token } = VerifySchema.parse(req.query);
+
+      const verificationToken = await prisma.verificationToken.findUnique({
+        where: { token },
+      });
+
+      if (!verificationToken) {
+        return res.status(400).json({ error: "Invalid token" });
+      }
+
+      if (verificationToken.expires < new Date()) {
+        return res.status(400).json({ error: "Token expired" });
+      }
+
+      await prisma.user
+        .update({
+          where: { id: verificationToken.identifier },
+          data: { isVerified: true },
+        })
+        .then(async () => {
+          await prisma.verificationToken.delete({
+            where: { token },
+          });
+        });
+
+      return res.status(200).json({ message: "User verified" });
+    } catch (error) {
+      res.status(500).json({
+        error: "Internal server error",
+      });
     }
   },
 };
