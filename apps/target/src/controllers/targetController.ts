@@ -3,6 +3,9 @@ import { env } from "../env";
 import { z } from "zod";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import crypto from "crypto";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const s3 = new S3Client({
   region: env.S3_BUCKET_REGION,
@@ -47,14 +50,18 @@ export const targetController = {
 
       const imageUrl = `${env.CLOUDFLARE_URL}/${key}`;
 
-      return res.json({
-        message: {
+      const target = await prisma.target.create({
+        data: {
           ownerId: body.ownerId,
           latitude: body.latitude,
           longitude: body.longitude,
           endDate: body.endDate,
           imageUrl,
         },
+      });
+
+      return res.json({
+        message: `Target created ${target}`,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
