@@ -14,17 +14,12 @@ export const createServer = (): Express => {
     .use(urlencoded({ extended: true }))
     .use(json())
     .use(cors())
-    .use(cookieParser())
-    .get("/status", (_, res) => {
-      return res.json({ ok: true });
-    })
-    .get("/protected", verifyToken, (req, res) => {
-      res.json({ message: "This is a secret message" });
-    })
-    .use("/auth/", authRouter)
-    .all("*", (req, res) => {
-      res.status(400).json({ error: `Path ${req.path} not found` });
-    });
+    .use(cookieParser());
+
+  app.use("/", authRouter);
+  app.all("*", (req, res) => {
+    res.status(400).json({ error: `Path ${req.path} not found` });
+  });
 
   return app;
 };

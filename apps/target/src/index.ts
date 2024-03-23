@@ -7,7 +7,6 @@ import cookieParser from "cookie-parser";
 import { targetRouter } from "./routes/targetRouter";
 import { targetReactionRouter } from "./routes/targetReaction";
 import multer from "multer";
-import { log } from "console";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -21,13 +20,8 @@ app
   .use(cors())
   .use(cookieParser());
 
-app.post("/target/test", upload.single("image"), (req, res) => {
-  log(req.body.location);
-  res.status(200).json({ location: JSON.parse(req.body.location) });
-});
-
-app.use("/target/", upload.single("image"), targetRouter);
-app.use("/target/:targetId/", targetReactionRouter);
+app.use("/", upload.single("image"), targetRouter);
+app.use("/:targetId/", targetReactionRouter);
 
 const port =
   new URL(env.TARGET_URL).port ||

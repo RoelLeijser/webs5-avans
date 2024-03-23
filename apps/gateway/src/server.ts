@@ -1,9 +1,30 @@
-import express, { type Express, json, urlencoded } from "express";
+import express, {
+  type Express,
+  json,
+  urlencoded,
+  RequestHandler,
+} from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import { env } from "./env";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import { requestWrapper } from "./requestWrapper";
+
+const createProxy = (url: string): RequestHandler => {
+  return (req, res, next) => {
+    return createProxyMiddleware({
+      target: url,
+      changeOrigin: true,
+      secure: env.NODE_ENV === "production",
+      logLevel: "debug",
+      pathRewrite: {
+        [`^/target`]: "/",
+        [`^/auth`]: "/",
+      },
+    })(req, res, next);
+  };
+};
 
 export const createServer = (): Express => {
   const app = express();
@@ -11,17 +32,14 @@ export const createServer = (): Express => {
     .disable("x-powered-by")
     .use(morgan("dev"))
     .use(urlencoded({ extended: true }))
-    .use(json())
     .use(cors())
-    .use(cookieParser())
-    .get("/status", (_, res) => {
-      return res.json({ ok: true });
-    })
-    .all("/auth/*", requestWrapper(env.AUTH_URL))
-    .all("/target/*", requestWrapper(env.TARGET_URL))
-    .all("*", (req, res) => {
-      res.status(404).json({ error: `Path ${req.path} not found` });
-    }); // this route match should be last
+    .use(cookieParser());
+
+  app
+    .use("/target", requestWrapper(env.TARGET_URL))
+    .use("/auth", requestWrapper(env.AUTH_URL));
+
+  app.use(json());
 
   return app;
 };

@@ -1,13 +1,14 @@
 import { log } from "console";
 import { RequestHandler, Request, Response, NextFunction } from "express";
-import proxy from "express-http-proxy";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import CircuitBreaker from "opossum";
 
 const circuitBreakerOptions = {
-  timeout: 3000, // 3 seconds
+  timeout: 10 * 1000, // 10 seconds
   errorThresholdPercentage: 10, // 10% of requests can fail
   resetTimeout: 30 * 1000, // 30 seconds
 };
+
 const proxyHandler = (
   url: string,
   req: Request,
@@ -15,17 +16,24 @@ const proxyHandler = (
   next: NextFunction
 ) => {
   return new Promise((resolve, reject) => {
-    proxy(url, {
-      userResDecorator: (_, data) => {
-        resolve(data);
-        return data;
+    const proxyMiddleware = createProxyMiddleware({
+      target: url,
+      changeOrigin: true,
+      pathRewrite: {
+        [`^/target`]: "/",
+        [`^/auth`]: "/",
       },
-      proxyErrorHandler(err, _, next) {
+      onError: (err) => {
         reject(err);
       },
-    })(req, res, next);
+      onProxyRes: (proxyRes) => {
+        resolve(proxyRes);
+      },
+    });
+    proxyMiddleware(req, res, next);
   });
 };
+
 const circuitBreaker = new CircuitBreaker(proxyHandler, circuitBreakerOptions);
 
 circuitBreaker.on("open", () => {
@@ -45,6 +53,7 @@ export const requestWrapper = (url: string): RequestHandler => {
     circuitBreaker.fallback(() => {
       res.status(500).json({ error: "Service temporarily unavailable" });
     });
+
     circuitBreaker.fire(url, req, res, next);
   };
 };
