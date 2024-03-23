@@ -8,6 +8,11 @@ export const env = createEnv({
       .enum(["development", "production", "test"])
       .default("development"),
     RABBITMQ_URL: z.string().url(),
+    S3_BUCKET_NAME: z.string(),
+    S3_BUCKET_REGION: z.string(),
+    AWS_ACCESS_KEY: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
+    CLOUDFLARE_URL: z.string().url(),
   },
 
   /**

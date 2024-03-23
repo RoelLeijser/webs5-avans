@@ -6,10 +6,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { targetRouter } from "./routes/targetRouter";
 import { targetReactionRouter } from "./routes/targetReaction";
-import multer from "multer";
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const app = express();
 app
@@ -20,7 +16,7 @@ app
   .use(cors())
   .use(cookieParser());
 
-app.use("/", upload.single("image"), targetRouter);
+app.use("/", targetRouter);
 app.use("/:targetId/", targetReactionRouter);
 
 const port =
