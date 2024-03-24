@@ -17,6 +17,7 @@ datasource db {
 model Target {
   id        String           @id @default(cuid())
   ownerId   String
+  imageKey  String
   imageUrl  String           @unique
   latitude  Float
   longitude Float
@@ -32,6 +33,7 @@ model TargetReaction {
   id        String     @id @default(cuid())
   Target    Target?    @relation(fields: [targetId], references: [id])
   targetId  String?
+  imageKey  String
   imageUrl  String     @unique
   upvotes   Upvote[]
   downvotes Downvote[]

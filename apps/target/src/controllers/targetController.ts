@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { env } from "../env";
 import { z } from "zod";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 
@@ -32,6 +36,10 @@ const CreateTargetRequestSchema = z.object({
   }),
 });
 
+const DeleteTargetRequestSchema = z.object({
+  targetId: z.string(),
+});
+
 export const targetController = {
   create: async (req: Request, res: Response) => {
     try {
@@ -56,12 +64,13 @@ export const targetController = {
           latitude: body.latitude,
           longitude: body.longitude,
           endDate: body.endDate,
+          imageKey: key,
           imageUrl,
         },
       });
 
       return res.json({
-        message: `Target created ${target}`,
+        message: target,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -77,6 +86,38 @@ export const targetController = {
   },
 
   delete: async (req: Request, res: Response) => {
-    return res.json({ message: `Delete target ${req.params.targetId}` });
+    try {
+      const { targetId } = DeleteTargetRequestSchema.parse(req.params);
+
+      const target = await prisma.target.findUnique({
+        where: { id: targetId },
+      });
+
+      if (!target) {
+        return res.status(404).json({ error: "Target not found" });
+      }
+
+      const command = new DeleteObjectCommand({
+        Bucket: env.S3_BUCKET_NAME,
+        Key: target.imageKey,
+      });
+
+      await prisma.target
+        .delete({ where: { id: targetId } })
+        .then(async () => {
+          await s3.send(command);
+        })
+        .then((target) => {
+          //send to rabbitmq
+        });
+
+      return res.json({ message: `Delete target ${targetId}` });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      } else {
+        return res.status(500).json({ error: "Internal server error" });
+      }
+    }
   },
 };
