@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-s3";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
+import { pub } from "../rabbitmq";
 
 const prisma = new PrismaClient();
 
@@ -33,6 +34,17 @@ const CreateTargetRequestSchema = z.object({
   file: z.object({
     buffer: z.instanceof(Buffer),
     mimetype: z.string().startsWith("image/"),
+  }),
+});
+
+const UpdateTargetRequestSchema = z.object({
+  params: z.object({
+    targetId: z.string(),
+  }),
+  body: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+    endDate: z.string().transform((arg) => new Date(arg)),
   }),
 });
 
@@ -69,6 +81,11 @@ export const targetController = {
         },
       });
 
+      await pub.send(
+        { exchange: "target-events", routingKey: "target.created" },
+        { target }
+      );
+
       return res.json({
         message: target,
       });
@@ -82,7 +99,33 @@ export const targetController = {
   },
 
   update: async (req: Request, res: Response) => {
-    return res.json({ message: `Update target ${req.params.targetId}` });
+    const { params, body } = UpdateTargetRequestSchema.parse(req);
+
+    const target = await prisma.target.findUnique({
+      where: { id: params.targetId },
+    });
+
+    if (!target) {
+      return res.status(404).json({ error: "Target not found" });
+    }
+
+    const updatedTarget = await prisma.target
+      .update({
+        where: { id: params.targetId },
+        data: {
+          latitude: body.latitude,
+          longitude: body.longitude,
+          endDate: body.endDate,
+        },
+      })
+      .then(async (target) => {
+        await pub.send(
+          { exchange: "target-events", routingKey: "target.updated" },
+          { target: target }
+        );
+      });
+
+    return res.json({ message: "Update target", updatedTarget });
   },
 
   delete: async (req: Request, res: Response) => {
@@ -107,8 +150,11 @@ export const targetController = {
         .then(async () => {
           await s3.send(command);
         })
-        .then((target) => {
-          //send to rabbitmq
+        .then(async () => {
+          await pub.send(
+            { exchange: "target-events", routingKey: "target.deleted" },
+            { target }
+          );
         });
 
       return res.json({ message: `Delete target ${targetId}` });

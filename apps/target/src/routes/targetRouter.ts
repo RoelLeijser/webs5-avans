@@ -25,7 +25,7 @@ targetRouter.post("/", upload.single("image"), async (req, res) => {
 
 targetRouter
   .route("/:targetId")
-  .put(async (req, res) => {
+  .patch(async (req, res) => {
     return await targetController.update(req, res);
   })
   .delete(async (req, res) => {
