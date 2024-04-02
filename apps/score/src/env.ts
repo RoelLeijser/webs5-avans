@@ -4,6 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     SCORE_DB_URL: z.string().url(),
+    IMAGGA_KEY: z.string(),
+    IMAGGA_SECRET: z.string(),
   },
 
   /**

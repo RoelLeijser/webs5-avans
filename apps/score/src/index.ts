@@ -1,6 +1,7 @@
 import { rabbit } from "./rabbitmq";
 import { uploadScore } from "./schema";
 import { mongoConnect } from "./mongooseconnect";
+import { env } from "./env";
 
 mongoConnect();
 
@@ -16,7 +17,7 @@ function convertRange(value: number, r1: number[], r2: number[]) {
 
 async function getSimilarityScore(imageUrl1: string, imageUrl2: string) {
   const credentials = Buffer.from(
-    `${process.env.IMAGGA_KEY}:${process.env.IMAGGA_SECRET}`
+    `${env.IMAGGA_KEY}:${env.IMAGGA_SECRET}`
   ).toString("base64");
   const endpoint = `https://api.imagga.com/v2/images-similarity/categories/general_v3?image_url=${encodeURIComponent(imageUrl1)}&image2_url=${encodeURIComponent(imageUrl2)}`;
   const response = await fetch(endpoint, {
@@ -41,12 +42,12 @@ const scoreCreatedPub = rabbit.createPublisher({
 
 const reactionCreatedSub = rabbit.createConsumer(
   {
-    queue: "target.reactioncreated",
+    queue: "targetReaction.created",
     queueOptions: { durable: true },
     qos: { prefetchCount: 2 },
     exchanges: [{ exchange: "target-events", type: "topic" }],
     queueBindings: [
-      { exchange: "target-events", routingKey: "target.reactioncreated" },
+      { exchange: "target-events", routingKey: "targetReaction.created" },
     ],
   },
   async (msg) => {
@@ -72,19 +73,4 @@ reactionCreatedSub.on("error", (err) => {
   console.log("consumer error (user-events)", err);
 });
 
-const testpub = rabbit.createPublisher({
-  confirm: true,
-  maxAttempts: 2,
-  exchanges: [{ exchange: "target-events", type: "topic" }],
-});
-
 console.log("Score service running.");
-
-//get similarity score using 2 random real images
-// const result = (async () => {
-//   const result = await getSimilarityScore(
-//     "https://static.wikia.nocookie.net/vsbattles/images/d/da/Kisspng-phil-the-minion-birthday-minions-despicable-me-cli-minion-5abb7634ceab95.0695696415222349328465.png/revision/latest/scale-to-width-down/240?cb=20180916000856",
-//     "https://cdn11.bigcommerce.com/s-ydriczk/images/stencil/1500x1500/products/89800/96627/Otto-Minions-2-Official-Cardboard-Cutout-buy-now-at-starstills__59497.1659518609.jpg?c=2"
-//   );
-//   console.log(result);
-// })();
