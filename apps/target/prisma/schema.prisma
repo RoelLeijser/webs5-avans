@@ -31,6 +31,7 @@ model Target {
 
 model TargetReaction {
   id        String     @id @default(cuid())
+  ownerId   String
   Target    Target?    @relation(fields: [targetId], references: [id])
   targetId  String?
   imageKey  String

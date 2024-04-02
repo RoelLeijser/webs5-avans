@@ -12,7 +12,7 @@ export const env = createEnv({
     S3_BUCKET_REGION: z.string(),
     AWS_ACCESS_KEY: z.string(),
     AWS_SECRET_ACCESS_KEY: z.string(),
-    CLOUDFLARE_URL: z.string().url(),
+    CLOUDFRONT_URL: z.string().url(),
   },
 
   /**

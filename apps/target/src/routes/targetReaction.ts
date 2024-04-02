@@ -1,17 +1,28 @@
 import { Router } from "express";
 import { targetReactionController } from "../controllers/targetReactionController";
+import multer from "multer";
 
 export const targetReactionRouter: Router = Router({ mergeParams: true });
 
-targetReactionRouter.post("/", async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type"));
+    }
+  },
+  limits: {
+    fileSize: 1024 * 1024 * 5, // 5MB
+  },
+});
+
+targetReactionRouter.post("/", upload.single("image"), async (req, res) => {
   return await targetReactionController.create(req, res);
 });
 
-targetReactionRouter
-  .route("/:id")
-  .put(async (req, res) => {
-    return await targetReactionController.update(req, res);
-  })
-  .delete(async (req, res) => {
-    return await targetReactionController.delete(req, res);
-  });
+targetReactionRouter.route("/:id").delete(async (req, res) => {
+  return await targetReactionController.delete(req, res);
+});

@@ -6,7 +6,7 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import crypto from "crypto";
+import { randomString } from "../utils/randomString";
 import { PrismaClient } from "@prisma/client";
 import { pub } from "../rabbitmq";
 
@@ -19,10 +19,6 @@ const s3 = new S3Client({
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
   },
 });
-
-const randomString = (bytes: number = 32) => {
-  return crypto.randomBytes(bytes).toString("hex");
-};
 
 const CreateTargetRequestSchema = z.object({
   body: z.object({
@@ -68,7 +64,7 @@ export const targetController = {
 
       await s3.send(command);
 
-      const imageUrl = `${env.CLOUDFLARE_URL}/${key}`;
+      const imageUrl = `${env.CLOUDFRONT_URL}/${key}`;
 
       const target = await prisma.target.create({
         data: {
