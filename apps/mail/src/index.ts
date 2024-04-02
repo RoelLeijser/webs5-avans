@@ -14,6 +14,8 @@ const sub = rabbitMQ.createConsumer(
     queueBindings: [{ exchange: "user.events", routingKey: "users.register" }],
   },
   async (msg) => {
+    console.log("Received message", msg.body);
+
     const event = RegisterSchema.parse(msg.body);
 
     await sendVerificationEmail(event);

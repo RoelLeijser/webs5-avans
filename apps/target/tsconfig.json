@@ -3,9 +3,7 @@
   "compilerOptions": {
     "lib": ["ES2015"],
     "module": "ES2015",
-    "outDir": "./dist",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "outDir": "./dist"
   },
   "exclude": ["node_modules"],
   "include": ["."]

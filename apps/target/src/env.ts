@@ -3,13 +3,16 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    GATEWAY_URL: z.string().url(),
-    AUTH_URL: z.string().url(),
     TARGET_URL: z.string().url(),
-    JWT_SECRET: z.string(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
+    RABBITMQ_URL: z.string().url(),
+    S3_BUCKET_NAME: z.string(),
+    S3_BUCKET_REGION: z.string(),
+    AWS_ACCESS_KEY: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
+    CLOUDFRONT_URL: z.string().url(),
   },
 
   /**

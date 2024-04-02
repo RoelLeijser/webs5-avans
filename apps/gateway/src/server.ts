@@ -11,16 +11,14 @@ export const createServer = (): Express => {
     .disable("x-powered-by")
     .use(morgan("dev"))
     .use(urlencoded({ extended: true }))
-    .use(json())
     .use(cors())
-    .use(cookieParser())
-    .get("/status", (_, res) => {
-      return res.json({ ok: true });
-    })
-    .all("/auth/*", requestWrapper(env.AUTH_URL))
-    .all("*", (req, res) => {
-      res.status(404).json({ error: `Path ${req.path} not found` });
-    }); // this route match should be last
+    .use(cookieParser());
+
+  app
+    .use("/target", requestWrapper(env.TARGET_URL))
+    .use("/auth", requestWrapper(env.AUTH_URL));
+
+  app.use(json());
 
   return app;
 };

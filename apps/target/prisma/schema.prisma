@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("TARGET_DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Target {
+  id        String           @id @default(cuid())
+  ownerId   String
+  imageKey  String
+  imageUrl  String           @unique
+  latitude  Float
+  longitude Float
+  endDate   DateTime
+  reactions TargetReaction[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  likes     Like[]
+}
+
+model TargetReaction {
+  id        String   @id @default(cuid())
+  ownerId   String
+  Target    Target?  @relation(fields: [targetId], references: [id])
+  targetId  String?
+  imageKey  String
+  imageUrl  String   @unique
+  likes     Like[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([targetId])
+}
+
+model Like {
+  id               String          @id @default(cuid())
+  userId           String
+  Target           Target?         @relation(fields: [targetId], references: [id])
+  targetId         String?
+  TargetReaction   TargetReaction? @relation(fields: [targetReactionId], references: [id])
+  targetReactionId String?
+  liked            Boolean
+
+  @@index([targetId])
+  @@index([targetReactionId])
+}

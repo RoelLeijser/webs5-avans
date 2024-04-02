@@ -1,6 +1,3 @@
-import { Connection } from "rabbitmq-client";
-import "node:crypto";
-import Queue from "bull";
 import { clockQueue } from "./bullsetup";
 import { addClock, updateClock, deleteClock } from "./clockjobs";
 import { rabbit } from "./rabbitmq";
@@ -35,8 +32,9 @@ const sub = rabbit.createConsumer(
   },
   async (msg) => {
     //create agenda job
-    console.log("Creating clock", msg.body.target_id);
-    await addClock(msg.body.target_id, new Date(msg.body.date));
+    const { target } = msg.body;
+    console.log("Adding clock", target.id);
+    await addClock(target.id, new Date(target.endDate));
   }
 );
 
@@ -56,8 +54,9 @@ const updateSub = rabbit.createConsumer(
   },
   async (msg) => {
     //update agenda job
-    console.log("Updating clock", msg.body.target_id);
-    await updateClock(msg.body.target_id, new Date(msg.body.date));
+    const { target } = msg.body;
+    console.log("Updating clock", target.id);
+    await updateClock(target.id, new Date(target.endDate));
   }
 );
 
@@ -77,8 +76,9 @@ const deleteSub = rabbit.createConsumer(
   },
   async (msg) => {
     //delete agenda job
-    console.log("Deleting clock", msg.body.target_id);
-    await deleteClock(msg.body.target_id);
+    const { target } = msg.body;
+    console.log("Deleting clock", target.id);
+    await deleteClock(target.id);
   }
 );
 
