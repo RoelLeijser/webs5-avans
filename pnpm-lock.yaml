@@ -316,6 +316,61 @@ importers:
         specifier: ^5.3.3
         version: 5.4.2
 
+  apps/score:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.9.2
+        version: 0.9.2(typescript@5.4.2)(zod@3.22.4)
+      '@typegoose/typegoose':
+        specifier: ^12.2.0
+        version: 12.2.0(mongoose@8.2.4)
+      bull:
+        specifier: ^4.12.2
+        version: 4.12.2
+      mongoose:
+        specifier: ^8.2.4
+        version: 8.2.4
+      rabbitmq-client:
+        specifier: ^4.5.1
+        version: 4.5.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@types/jest':
+        specifier: ^29.5.12
+        version: 29.5.12
+      '@types/node':
+        specifier: ^20.11.19
+        version: 20.11.28
+      '@types/supertest':
+        specifier: ^6.0.2
+        version: 6.0.2
+      '@webs5/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/config-eslint
+      '@webs5/jest-presets':
+        specifier: workspace:*
+        version: link:../../packages/jest-presets
+      '@webs5/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
+      dotenv-cli:
+        specifier: ^7.3.0
+        version: 7.4.1
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@20.11.28)
+      supertest:
+        specifier: ^6.3.4
+        version: 6.3.4
+      tsup:
+        specifier: ^8.0.2
+        version: 8.0.2(typescript@5.4.2)
+      typescript:
+        specifier: ^5.3.3
+        version: 5.4.2
+
   apps/target:
     dependencies:
       '@aws-sdk/client-s3':
@@ -4205,7 +4260,21 @@ packages:
       lodash: 4.17.21
       loglevel: 1.9.1
       mongoose: 8.2.3
-      reflect-metadata: 0.2.1
+      reflect-metadata: 0.2.2
+      semver: 7.6.0
+      tslib: 2.6.2
+    dev: false
+
+  /@typegoose/typegoose@12.2.0(mongoose@8.2.4):
+    resolution: {integrity: sha512-6gC5aIfccXw4IZOMe3oSef63M6leDyMvuycfwzQdVi8M9C5UnpaV8tO1xzmxiOxUHDST0GdDW/aWCCX6MtOQxg==}
+    engines: {node: '>=16.20.1'}
+    peerDependencies:
+      mongoose: ~8.2.0
+    dependencies:
+      lodash: 4.17.21
+      loglevel: 1.9.1
+      mongoose: 8.2.4
+      reflect-metadata: 0.2.2
       semver: 7.6.0
       tslib: 2.6.2
     dev: false
@@ -9756,6 +9825,28 @@ packages:
       - supports-color
     dev: false
 
+  /mongoose@8.2.4:
+    resolution: {integrity: sha512-da/r6zpG+2eAXuhBGUnL6jcBd03zlytoCc5/wq+LyTsmrY9hhPQmSpnugwnfqldtBmUOhB6iMLoV4hNtHRq+ww==}
+    engines: {node: '>=16.20.1'}
+    dependencies:
+      bson: 6.5.0
+      kareem: 2.5.1
+      mongodb: 6.3.0
+      mpath: 0.9.0
+      mquery: 5.0.0
+      ms: 2.1.3
+      sift: 16.0.1
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-providers'
+      - '@mongodb-js/zstd'
+      - gcp-metadata
+      - kerberos
+      - mongodb-client-encryption
+      - snappy
+      - socks
+      - supports-color
+    dev: false
+
   /morgan@1.10.0:
     resolution: {integrity: sha512-AbegBVI4sh6El+1gNwvD5YIck7nSA36weD7xvIxG4in80j/UoK8AEGaWnnz8v1GxonMCltmlNs5ZKbGvl9b1XQ==}
     engines: {node: '>= 0.8.0'}
@@ -10296,22 +10387,6 @@ packages:
       postcss: 8.4.35
     dev: false
 
-  /postcss-load-config@4.0.2:
-    resolution: {integrity: sha512-bSVhyJGL00wMVoPUzAVAnbEoWyqRxkjv64tUl427SKnPrENtq6hJwUojroMz2VB+Q1edmi4IfrAPpami5VVgMQ==}
-    engines: {node: '>= 14'}
-    peerDependencies:
-      postcss: '>=8.0.9'
-      ts-node: '>=9.0.0'
-    peerDependenciesMeta:
-      postcss:
-        optional: true
-      ts-node:
-        optional: true
-    dependencies:
-      lilconfig: 3.1.1
-      yaml: 2.3.4
-    dev: true
-
   /postcss-load-config@4.0.2(postcss@8.4.35):
     resolution: {integrity: sha512-bSVhyJGL00wMVoPUzAVAnbEoWyqRxkjv64tUl427SKnPrENtq6hJwUojroMz2VB+Q1edmi4IfrAPpami5VVgMQ==}
     engines: {node: '>= 14'}
@@ -10772,8 +10847,8 @@ packages:
       '@redis/time-series': 1.0.5(@redis/client@1.5.14)
     dev: false
 
-  /reflect-metadata@0.2.1:
-    resolution: {integrity: sha512-i5lLI6iw9AU3Uu4szRNPPEkomnkjRTaVt9hy/bn5g/oSzekBSMeLZblcjP74AW0vBabqERLLIrz+gR8QYR54Tw==}
+  /reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
     dev: false
 
   /reflect.getprototypeof@1.0.4:
@@ -11894,7 +11969,7 @@ packages:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.2
+      postcss-load-config: 4.0.2(postcss@8.4.35)
       resolve-from: 5.0.0
       rollup: 4.13.0
       source-map: 0.8.0-beta.0
