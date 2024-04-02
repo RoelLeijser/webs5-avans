@@ -25,44 +25,31 @@ model Target {
   reactions TargetReaction[]
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  upvotes   Upvote[]
-  downvotes Downvote[]
+  likes     Like[]
 }
 
 model TargetReaction {
-  id        String     @id @default(cuid())
+  id        String   @id @default(cuid())
   ownerId   String
-  Target    Target?    @relation(fields: [targetId], references: [id])
+  Target    Target?  @relation(fields: [targetId], references: [id])
   targetId  String?
   imageKey  String
-  imageUrl  String     @unique
-  upvotes   Upvote[]
-  downvotes Downvote[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  imageUrl  String   @unique
+  likes     Like[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([targetId])
 }
 
-model Upvote {
+model Like {
   id               String          @id @default(cuid())
   userId           String
   Target           Target?         @relation(fields: [targetId], references: [id])
   targetId         String?
   TargetReaction   TargetReaction? @relation(fields: [targetReactionId], references: [id])
   targetReactionId String?
-
-  @@index([targetId])
-  @@index([targetReactionId])
-}
-
-model Downvote {
-  id               String          @id @default(cuid())
-  userId           String
-  Target           Target?         @relation(fields: [targetId], references: [id])
-  targetId         String?
-  TargetReaction   TargetReaction? @relation(fields: [targetReactionId], references: [id])
-  targetReactionId String?
+  liked            Boolean
 
   @@index([targetId])
   @@index([targetReactionId])

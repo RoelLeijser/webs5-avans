@@ -23,6 +23,10 @@ targetReactionRouter.post("/", upload.single("image"), async (req, res) => {
   return await targetReactionController.create(req, res);
 });
 
+targetReactionRouter.patch("/:id/like", async (req, res) => {
+  return await targetReactionController.like(req, res);
+});
+
 targetReactionRouter.route("/:id").delete(async (req, res) => {
   return await targetReactionController.delete(req, res);
 });

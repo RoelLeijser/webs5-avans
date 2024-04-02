@@ -23,6 +23,10 @@ targetRouter.post("/", upload.single("image"), async (req, res) => {
   return await targetController.create(req, res);
 });
 
+targetRouter.patch("/:targetId/like", async (req, res) => {
+  return await targetController.like(req, res);
+});
+
 targetRouter
   .route("/:targetId")
   .patch(async (req, res) => {

@@ -48,6 +48,16 @@ const DeleteTargetRequestSchema = z.object({
   targetId: z.string(),
 });
 
+const LikeTargetRequestSchema = z.object({
+  params: z.object({
+    targetId: z.string(),
+  }),
+  body: z.object({
+    userId: z.string(),
+    liked: z.boolean().nullable(),
+  }),
+});
+
 export const targetController = {
   create: async (req: Request, res: Response) => {
     try {
@@ -159,6 +169,63 @@ export const targetController = {
         return res.status(400).json({ error: error.errors });
       } else {
         return res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  },
+  async like(req: Request, res: Response) {
+    try {
+      const { params, body } = LikeTargetRequestSchema.parse(req);
+
+      const target = await prisma.target.findUnique({
+        where: { id: params.targetId },
+      });
+
+      if (!target) {
+        return res.status(404).json({ error: "Target not found" });
+      }
+
+      const like = await prisma.like.findFirst({
+        where: {
+          userId: body.userId,
+          targetId: params.targetId,
+        },
+      });
+
+      if (like) {
+        await prisma.like.delete({
+          where: {
+            id: like.id,
+          },
+        });
+      }
+
+      if (body.liked === null) {
+        prisma.like.deleteMany({
+          where: {
+            userId: body.userId,
+            targetId: params.targetId,
+          },
+        });
+      } else {
+        await prisma.like.create({
+          data: {
+            userId: body.userId,
+            liked: body.liked,
+            Target: {
+              connect: {
+                id: params.targetId,
+              },
+            },
+          },
+        });
+      }
+
+      return res.json({ message: "Success" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      } else {
+        return res.status(500).json({ error: error });
       }
     }
   },
