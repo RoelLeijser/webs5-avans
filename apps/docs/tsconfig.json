@@ -1,0 +1,16 @@
+{
+  "extends": "@webs5/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2015"],
+    "module": "ES2015",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "Node",
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["."]
+}
