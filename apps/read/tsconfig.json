@@ -1,0 +1,17 @@
+{
+  "extends": "@webs5/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2015"],
+    "module": "ES2015",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "Bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false
+  },
+  "exclude": ["node_modules"],
+  "include": ["."]
+}
