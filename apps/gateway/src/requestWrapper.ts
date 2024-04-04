@@ -2,6 +2,7 @@ import { log } from "console";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import CircuitBreaker from "opossum";
+import { env } from "./env";
 
 const circuitBreakerOptions = {
   timeout: 10 * 1000, // 10 seconds
@@ -20,8 +21,10 @@ const proxyHandler = (
       target: url,
       changeOrigin: true,
       pathRewrite: {
-        [`^/target`]: "/",
-        [`^/auth`]: "/",
+        // /targets should always be above the /target route because it matches target route as well
+        [`^/targets`]: "",
+        [`^/target`]: "",
+        [`^/auth`]: "",
       },
       onError: (err) => {
         reject(err);

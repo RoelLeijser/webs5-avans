@@ -249,9 +249,10 @@ targetUpdatedSub.on("error", (err) => {
 });
 
 const app = Express();
-app.use(Express.json());
-app.use(Express.urlencoded({ extended: true }));
+app.use(Express.json()).use(Express.urlencoded({ extended: true }));
+
 app.use("/", targetRouter);
+
 const port =
   new URL(env.READ_URL).port ||
   (new URL(env.READ_URL).protocol === "https:" ? "443" : "80");

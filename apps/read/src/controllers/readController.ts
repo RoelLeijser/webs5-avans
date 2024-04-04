@@ -28,6 +28,10 @@ const TargetParamsSchema = z.object({
     .default(10),
 });
 
+const TargetSchema = z.object({
+  id: z.string(),
+});
+
 export const readController = {
   async getAll(req: Request, res: Response) {
     try {
@@ -68,14 +72,25 @@ export const readController = {
   },
   async getOne(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const { id } = TargetSchema.parse(req.params);
 
       const target = await TargetModel.findById(id)
         .populate("likes")
         .populate("reactions");
+
+      if (!target) {
+        return res.status(404).json({
+          message: "Target not found",
+        });
+      }
+
       return res.json(target);
     } catch (error) {
-      return res.status(404).send("Target not found");
+      if (error instanceof z.ZodError) {
+        return res.status(400).json(error.errors);
+      }
+      console.log(error);
+      return res.status(500).json(error);
     }
   },
 };
