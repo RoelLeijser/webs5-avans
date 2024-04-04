@@ -18,34 +18,38 @@ const AllTargetsRequestSchema = z.object({
     .preprocess((val) => Number(val), z.number().min(-180).max(180))
     .optional(),
   maxDistance: z.preprocess((val) => Number(val), z.number().min(0)).optional(),
+  page: z.preprocess((val) => Number(val), z.number()),
+  limit: z.preprocess((val) => Number(val), z.number()),
 });
 
 export const readController = {
   async getAll(req: Request, res: Response) {
     try {
-      const { isAfter, isBefore, lat, lng, maxDistance } =
-        AllTargetsRequestSchema.parse(req.query);
+      const params = AllTargetsRequestSchema.parse(req.query);
 
       let query = {};
 
       query = {
-        ...(isAfter && { endDate: { $gte: isAfter } }),
-        ...(isBefore && { endDate: { $lte: isBefore } }),
-        ...(lat &&
-          lng && {
+        ...(params.isAfter && { endDate: { $gte: params.isAfter } }),
+        ...(params.isBefore && { endDate: { $lte: params.isBefore } }),
+        ...(params.lat &&
+          params.lng && {
             coordinates: {
               $near: {
                 $geometry: {
                   type: "Point",
-                  coordinates: [lat, lng],
+                  coordinates: [params.lat, params.lng],
                 },
-                $maxDistance: maxDistance || 5000, // Maximum distance from the given point in meters (default is 5km)
+                $maxDistance: params.maxDistance || 5000, // Maximum distance from the given point in meters (default is 5km)
               },
             },
           }),
       };
 
-      const targets = await TargetModel.find(query);
+      const targets = await TargetModel.paginate(query, {
+        page: params.page || 1,
+        limit: params.limit || 10,
+      });
       return res.json(targets);
     } catch (error) {
       if (error instanceof z.ZodError) {

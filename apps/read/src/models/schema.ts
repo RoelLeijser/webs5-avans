@@ -1,5 +1,14 @@
-import { prop, getModelForClass, type Ref } from "@typegoose/typegoose";
+import { prop, getModelForClass, type Ref, plugin } from "@typegoose/typegoose";
+import { FilterQuery, PaginateOptions, PaginateResult } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
+type PaginateMethod<T> = (
+  query?: FilterQuery<T>,
+  options?: PaginateOptions,
+  callback?: (err: any, result: PaginateResult<T>) => void
+) => Promise<PaginateResult<T>>;
+
+@plugin(mongoosePaginate)
 class Target {
   @prop()
   _id?: string;
@@ -27,6 +36,8 @@ class Target {
 
   @prop({ type: () => [String] })
   likes?: Ref<Like>[];
+
+  static paginate: PaginateMethod<Target>;
 }
 
 class TargetReaction {
