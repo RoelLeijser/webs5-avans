@@ -1,38 +1,48 @@
-import { Request, Response, query } from "express";
+import { Request, Response } from "express";
 import { TargetModel } from "../models/schema";
-import { ReturnModelType } from "@typegoose/typegoose";
 import { z } from "zod";
 
-const AllTargetsRequestSchema = z
-  .object({
-    isAfter: z
-      .string()
-      .transform((arg) => new Date(arg))
-      .optional(),
-    isBefore: z
-      .string()
-      .transform((arg) => new Date(arg))
-      .optional(),
-    lat: z.number().min(-90).max(90).optional(),
-    long: z.number().min(-180).max(180).optional(),
-    maxDistance: z.number().optional(),
-  })
-  .refine((data) => data.lat !== undefined && data.long !== undefined, {
-    message: "Both latitude and longitude must be provided together",
-  });
+const AllTargetsRequestSchema = z.object({
+  isAfter: z
+    .string()
+    .transform((arg) => new Date(arg))
+    .optional(),
+  isBefore: z
+    .string()
+    .transform((arg) => new Date(arg))
+    .optional(),
+  lat: z
+    .preprocess((val) => Number(val), z.number().min(-90).max(90))
+    .optional(),
+  lng: z
+    .preprocess((val) => Number(val), z.number().min(-180).max(180))
+    .optional(),
+  maxDistance: z.preprocess((val) => Number(val), z.number().min(0)).optional(),
+});
 
 export const readController = {
   async getAll(req: Request, res: Response) {
     try {
-      const { isAfter, isBefore, lat, long } = AllTargetsRequestSchema.parse(
-        req.query
-      );
+      const { isAfter, isBefore, lat, lng, maxDistance } =
+        AllTargetsRequestSchema.parse(req.query);
 
       let query = {};
 
       query = {
-        ...(isAfter && { createdAt: { $gte: isAfter } }),
-        ...(isBefore && { createdAt: { $lte: isBefore } }),
+        ...(isAfter && { endDate: { $gte: isAfter } }),
+        ...(isBefore && { endDate: { $lte: isBefore } }),
+        ...(lat &&
+          lng && {
+            coordinates: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [lat, lng],
+                },
+                $maxDistance: maxDistance || 5000, // Maximum distance from the given point in meters (default is 5km)
+              },
+            },
+          }),
       };
 
       const targets = await TargetModel.find(query);

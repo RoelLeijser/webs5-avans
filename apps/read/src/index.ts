@@ -1,6 +1,6 @@
 import { rabbit } from "./rabbitmq";
 import { mongoConnect } from "./mongooseconnect";
-import { LikeModel, TargetModel } from "./models/schema";
+import { TargetModel } from "./models/schema";
 import Express from "express";
 import { env } from "./env";
 import { targetRouter } from "./routes/targetRouter";
@@ -22,20 +22,16 @@ const targetcreatedSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    //create agenda job
     const { target } = msg.body;
-    console.log(target);
+
     TargetModel.create({
       _id: target.id,
       ownerId: target.ownerId,
       imageUrl: target.imageUrl,
-      likes: [],
-      reactions: [],
       createdAt: target.createdAt,
       updatedAt: target.updatedAt,
       endDate: target.endDate,
-      latitude: target.latitude,
-      longitude: target.longitude,
+      coordinates: [target.latitude, target.longitude],
     });
   }
 );

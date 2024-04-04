@@ -7,14 +7,11 @@ class Target {
   @prop()
   ownerId?: string;
 
-  @prop({ unique: true })
+  @prop()
   imageUrl?: string;
 
-  @prop()
-  latitude?: number;
-
-  @prop()
-  longitude?: number;
+  @prop({ type: [Number], index: "2dsphere" }) // Define the location field
+  coordinates?: [number, number]; // Array containing [latitude, longitude]
 
   @prop()
   endDate?: Date;
@@ -45,13 +42,13 @@ class TargetReaction {
   @prop()
   targetId?: string;
 
-  @prop({ unique: true })
+  @prop()
   imageUrl?: string;
 
   @prop({ default: 0 })
   score?: number;
 
-  @prop({ type: () => [String] })
+  @prop({ type: () => [Like] })
   likes?: Ref<Like>[];
 
   @prop({ default: Date.now })
