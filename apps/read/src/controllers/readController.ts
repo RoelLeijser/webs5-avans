@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { TargetModel } from "../models/schema";
 import { z } from "zod";
 
-const AllTargetsRequestSchema = z.object({
+const TargetParamsSchema = z.object({
   isAfter: z
     .string()
     .transform((arg) => new Date(arg))
@@ -18,14 +18,20 @@ const AllTargetsRequestSchema = z.object({
     .preprocess((val) => Number(val), z.number().min(-180).max(180))
     .optional(),
   maxDistance: z.preprocess((val) => Number(val), z.number().min(0)).optional(),
-  page: z.preprocess((val) => Number(val), z.number()),
-  limit: z.preprocess((val) => Number(val), z.number()),
+  page: z
+    .preprocess((val) => Number(val), z.number())
+    .optional()
+    .default(1),
+  limit: z
+    .preprocess((val) => Number(val), z.number())
+    .optional()
+    .default(10),
 });
 
 export const readController = {
   async getAll(req: Request, res: Response) {
     try {
-      const params = AllTargetsRequestSchema.parse(req.query);
+      const params = TargetParamsSchema.parse(req.query);
 
       let query = {};
 
@@ -47,8 +53,8 @@ export const readController = {
       };
 
       const targets = await TargetModel.paginate(query, {
-        page: params.page || 1,
-        limit: params.limit || 10,
+        page: params.page,
+        limit: params.limit,
       });
       return res.json(targets);
     } catch (error) {
