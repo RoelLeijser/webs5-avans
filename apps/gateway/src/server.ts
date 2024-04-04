@@ -15,6 +15,8 @@ export const createServer = (): Express => {
     .use(cookieParser());
 
   app
+    .get("/targets", requestWrapper(env.READ_URL))
+    .get("/target/:id", requestWrapper(env.READ_URL))
     .use("/target", requestWrapper(env.TARGET_URL))
     .use("/auth", requestWrapper(env.AUTH_URL));
 

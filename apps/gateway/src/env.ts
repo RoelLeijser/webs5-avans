@@ -7,6 +7,7 @@ export const env = createEnv({
     AUTH_URL: z.string().url(),
     TARGET_URL: z.string().url(),
     JWT_SECRET: z.string(),
+    READ_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),

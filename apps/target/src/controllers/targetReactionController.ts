@@ -200,6 +200,30 @@ export const targetReactionController = {
         });
       }
 
+      const likes = await prisma.like.count({
+        where: {
+          targetReactionId: params.id,
+          liked: true,
+        },
+      });
+      const dislikes = await prisma.like.count({
+        where: {
+          targetReactionId: params.id,
+          liked: false,
+        },
+      });
+      await pub.send(
+        {
+          exchange: "target-events",
+          routingKey: "targetReaction.liked",
+        },
+        {
+          targetReaction,
+          likes,
+          dislikes,
+        }
+      );
+
       return res.json({ message: "Success" });
     } catch (error) {
       if (error instanceof z.ZodError) {

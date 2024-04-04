@@ -3,12 +3,8 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    GATEWAY_URL: z.string().url(),
-    RESEND_API_KEY: z.string(),
-    RABBITMQ_URL: z.string().url(),
-    NODE_ENV: z
-      .enum(["development", "production", "test"])
-      .default("development"),
+    READ_DB_URL: z.string().url(),
+    READ_URL: z.string().url(),
   },
 
   /**
