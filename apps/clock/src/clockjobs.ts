@@ -1,8 +1,8 @@
 import { clockQueue } from "./bullsetup";
 
-const addClock = async (target_id: string, date: Date) => {
+const addClock = async (targetId: string, date: Date) => {
   await clockQueue.add(
-    { target_id },
+    { targetId },
     {
       delay: date.getTime() - Date.now(),
       attempts: 2,
@@ -12,14 +12,14 @@ const addClock = async (target_id: string, date: Date) => {
   );
 };
 
-const findByTargetId = async (target_id: string) => {
+const findByTargetId = async (targetId: string) => {
   const jobs = await clockQueue.getJobs(["waiting", "delayed", "active"]);
-  const filteredjobs = jobs.filter((job) => job.data.target_id === target_id);
+  const filteredjobs = jobs.filter((job) => job.data.targetId === targetId);
   return filteredjobs;
 };
 
-const updateClock = async (target_id: string, date: Date) => {
-  const jobs = await findByTargetId(target_id);
+const updateClock = async (targetId: string, date: Date) => {
+  const jobs = await findByTargetId(targetId);
   const job = jobs[0];
   if (await job?.isDelayed) {
     await clockQueue.removeJobs(job.id.toString());
@@ -31,8 +31,8 @@ const updateClock = async (target_id: string, date: Date) => {
   }
 };
 
-const deleteClock = async (target_id: string) => {
-  const jobs = await findByTargetId(target_id);
+const deleteClock = async (targetId: string) => {
+  const jobs = await findByTargetId(targetId);
   jobs.forEach(async (job) => {
     await clockQueue.removeJobs(job.id.toString());
   });

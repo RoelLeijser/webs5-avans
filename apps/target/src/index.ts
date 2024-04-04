@@ -19,7 +19,7 @@ app
   .use(appendJwtUser());
 
 app.use(targetRouter);
-app.use(":targetId/", targetReactionRouter);
+app.use("/:targetId/", targetReactionRouter);
 
 const port =
   new URL(env.TARGET_URL).port ||

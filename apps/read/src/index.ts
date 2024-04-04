@@ -190,6 +190,10 @@ const targetReactionDeletedSub = rabbit.createConsumer(
   }
 );
 
+targetReactionDeletedSub.on("error", (err) => {
+  console.error(err);
+});
+
 const setReactionScoreSub = rabbit.createConsumer(
   {
     queue: "targetReaction.scorecreated",
@@ -245,6 +249,51 @@ const targetUpdatedSub = rabbit.createConsumer(
 );
 
 targetUpdatedSub.on("error", (err) => {
+  console.error(err);
+});
+
+const targetExpiredMailPub = rabbit.createPublisher({
+  exchanges: [{ exchange: "target-events", type: "topic" }],
+  confirm: true,
+  maxAttempts: 2,
+});
+
+const targetExpiredSub = rabbit.createConsumer(
+  {
+    queue: "target.expired",
+    queueOptions: { durable: true },
+    // handle 2 messages at a time
+    qos: { prefetchCount: 2 },
+    // Optionally ensure an exchange exists
+    exchanges: [{ exchange: "target-events", type: "topic" }],
+    // With a "topic" exchange, messages matching this pattern are routed to the queue
+    queueBindings: [
+      { exchange: "target-events", routingKey: "target.expired" },
+    ],
+  },
+  async (msg) => {
+    console.log(msg.body);
+
+    const target = await TargetModel.findById(msg.body.targetId);
+
+    //find all reactions from the target and get their ownerId and score
+    const reactions = target?.reactions?.map((reaction) => {
+      return { ownerId: reaction.ownerId, score: reaction.score };
+    });
+
+    await targetExpiredMailPub.send(
+      { exchange: "target-events", routingKey: "target.result" },
+      {
+        reactions,
+        winner: reactions?.reduce((prev, current) => {
+          return prev.score! > current.score! ? prev : current;
+        }),
+      }
+    );
+  }
+);
+
+targetExpiredSub.on("error", (err) => {
   console.error(err);
 });
 
