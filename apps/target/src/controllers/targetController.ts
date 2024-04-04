@@ -21,8 +21,10 @@ const s3 = new S3Client({
 });
 
 const CreateTargetRequestSchema = z.object({
+  user: z.object({
+    id: z.string(),
+  }),
   body: z.object({
-    ownerId: z.string(),
     latitude: z.preprocess((val) => Number(val), z.number()),
     longitude: z.preprocess((val) => Number(val), z.number()),
     endDate: z.string().transform((arg) => new Date(arg)),
@@ -53,15 +55,17 @@ const LikeTargetRequestSchema = z.object({
     targetId: z.string(),
   }),
   body: z.object({
-    userId: z.string(),
     liked: z.boolean().nullable(),
+  }),
+  user: z.object({
+    id: z.string(),
   }),
 });
 
 export const targetController = {
   create: async (req: Request, res: Response) => {
     try {
-      const { body, file } = CreateTargetRequestSchema.parse(req);
+      const { body, file, user } = CreateTargetRequestSchema.parse(req);
 
       const key = randomString();
 
@@ -78,7 +82,7 @@ export const targetController = {
 
       const target = await prisma.target.create({
         data: {
-          ownerId: body.ownerId,
+          ownerId: user.id,
           latitude: body.latitude,
           longitude: body.longitude,
           endDate: body.endDate,
@@ -174,7 +178,7 @@ export const targetController = {
   },
   async like(req: Request, res: Response) {
     try {
-      const { params, body } = LikeTargetRequestSchema.parse(req);
+      const { params, body, user } = LikeTargetRequestSchema.parse(req);
 
       const target = await prisma.target.findUnique({
         where: { id: params.targetId },
@@ -186,7 +190,7 @@ export const targetController = {
 
       const like = await prisma.like.findFirst({
         where: {
-          userId: body.userId,
+          userId: user.id,
           targetId: params.targetId,
         },
       });
@@ -202,14 +206,14 @@ export const targetController = {
       if (body.liked === null) {
         prisma.like.deleteMany({
           where: {
-            userId: body.userId,
+            userId: user.id,
             targetId: params.targetId,
           },
         });
       } else {
         await prisma.like.create({
           data: {
-            userId: body.userId,
+            userId: user.id,
             liked: body.liked,
             Target: {
               connect: {

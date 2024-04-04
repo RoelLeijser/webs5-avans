@@ -13,6 +13,7 @@ export const env = createEnv({
     AWS_ACCESS_KEY: z.string(),
     AWS_SECRET_ACCESS_KEY: z.string(),
     CLOUDFRONT_URL: z.string().url(),
+    JWT_SECRET: z.string(),
   },
 
   /**
