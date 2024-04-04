@@ -26,7 +26,7 @@ class Target {
   endDate?: Date;
 
   @prop({ type: () => [TargetReaction] })
-  reactions?: Ref<TargetReaction>[];
+  reactions?: TargetReaction[];
 
   @prop({ default: Date.now })
   createdAt?: Date;
@@ -34,8 +34,11 @@ class Target {
   @prop({ default: Date.now })
   updatedAt?: Date;
 
-  @prop({ type: () => [String] })
-  likes?: Ref<Like>[];
+  @prop({ type: Number, default: 0 })
+  likes?: number;
+
+  @prop({ type: Number, default: 0 })
+  dislikes?: number;
 
   static paginate: PaginateMethod<Target>;
 }
@@ -47,8 +50,8 @@ class TargetReaction {
   @prop()
   ownerId?: string;
 
-  @prop({ ref: () => Target })
-  target?: Ref<Target>;
+  @prop({ ref: Target })
+  target?: Target;
 
   @prop()
   targetId?: string;
@@ -59,8 +62,11 @@ class TargetReaction {
   @prop({ default: 0 })
   score?: number;
 
-  @prop({ type: () => [Like] })
-  likes?: Ref<Like>[];
+  @prop({ type: Number, default: 0 })
+  likes?: number;
+
+  @prop({ type: Number, default: 0 })
+  dislikes?: number;
 
   @prop({ default: Date.now })
   createdAt?: Date;
@@ -69,29 +75,5 @@ class TargetReaction {
   updatedAt?: Date;
 }
 
-class Like {
-  @prop()
-  _id?: string;
-
-  @prop()
-  userId?: string;
-
-  @prop({ ref: () => Target })
-  target?: Ref<Target>;
-
-  @prop()
-  targetId?: string;
-
-  @prop({ ref: () => TargetReaction })
-  targetReaction?: Ref<TargetReaction>;
-
-  @prop()
-  targetReactionId?: string;
-
-  @prop()
-  liked?: boolean;
-}
-
 export const TargetModel = getModelForClass(Target);
 export const TargetReactionModel = getModelForClass(TargetReaction);
-export const LikeModel = getModelForClass(Like);

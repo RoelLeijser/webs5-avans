@@ -15,25 +15,33 @@ function convertRange(value: number, r1: number[], r2: number[]) {
   return ((value - r1[0]) * (r2[1] - r2[0])) / (r1[1] - r1[0]) + r2[0];
 }
 
-async function getSimilarityScore(imageUrl1: string, imageUrl2: string) {
+type ImaggaResponse = {
+  result: {
+    distance: number;
+  };
+};
+
+async function getSimilarityScore(
+  imageUrl1: string,
+  imageUrl2: string
+): Promise<ImaggaResponse> {
   const credentials = Buffer.from(
     `${env.IMAGGA_KEY}:${env.IMAGGA_SECRET}`
   ).toString("base64");
   const endpoint = `https://api.imagga.com/v2/images-similarity/categories/general_v3?image_url=${encodeURIComponent(imageUrl1)}&image2_url=${encodeURIComponent(imageUrl2)}`;
+
   const response = await fetch(endpoint, {
     headers: {
       Authorization: `Basic ${credentials}`,
     },
-  })
-    .then(async (res) => {
-      return await res.json();
-    })
-    .catch((error) => {
-      console.error("Error fetching similarity score:", error);
-    });
-  return response;
-}
+  });
 
+  if (!response.ok) {
+    throw new Error("Failed to fetch similarity score");
+  }
+
+  return (await response.json()) as ImaggaResponse;
+}
 const scoreCreatedPub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
@@ -51,21 +59,30 @@ const reactionCreatedSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    const simScore: any = await getSimilarityScore(
-      msg.body.target.imageUrl,
-      msg.body.targetReaction.imageUrl
+    const { target, targetReaction } = msg.body;
+
+    const simScore = await getSimilarityScore(
+      target.imageUrl,
+      targetReaction.imageUrl
     );
     const score = calculateScore(
-      new Date(msg.body.targetReaction.createdAt),
+      new Date(targetReaction.createdAt),
       simScore.result.distance
     );
-    console.log(simScore);
-    await uploadScore(score, msg.body.target.id, msg.body.targetReaction.id);
-    await scoreCreatedPub.send("target.scorecreated", {
-      score,
-      targetId: msg.body.target.id,
-      responseId: msg.body.targetReaction.id,
-    });
+
+    await uploadScore(score, target.id, targetReaction.id);
+    await scoreCreatedPub
+      .send("targetReaction.scorecreated", {
+        score,
+        targetId: target.id,
+        responseId: targetReaction.id,
+      })
+      .then(() => {
+        console.log("Score published.");
+      })
+      .catch((err) => {
+        console.log("Error publishing score:", err);
+      });
   }
 );
 

@@ -219,7 +219,27 @@ export const targetController = {
           },
         });
       }
-
+      const likes = await prisma.like.count({
+        where: {
+          targetId: params.targetId,
+          liked: true,
+        },
+      });
+      const dislikes = await prisma.like.count({
+        where: {
+          targetId: params.targetId,
+          liked: false,
+        },
+      });
+      //create rabbit pub for like
+      await pub.send(
+        { exchange: "target-events", routingKey: "target.liked" },
+        {
+          targetId: target.id,
+          likes,
+          dislikes,
+        }
+      );
       return res.json({ message: "Success" });
     } catch (error) {
       if (error instanceof z.ZodError) {

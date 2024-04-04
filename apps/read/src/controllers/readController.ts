@@ -44,7 +44,7 @@ export const readController = {
               $near: {
                 $geometry: {
                   type: "Point",
-                  coordinates: [params.lat, params.lng],
+                  coordinates: [params.lng, params.lat],
                 },
                 $maxDistance: params.maxDistance || 5000, // Maximum distance from the given point in meters (default is 5km)
               },
@@ -55,12 +55,14 @@ export const readController = {
       const targets = await TargetModel.paginate(query, {
         page: params.page,
         limit: params.limit,
+        forceCountFn: true,
       });
       return res.json(targets);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json(error.errors);
       }
+      console.log(error);
       return res.status(500).json(error);
     }
   },
