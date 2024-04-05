@@ -1,9 +1,8 @@
 import { rabbit } from "./rabbitmq";
 import { mongoConnect } from "./mongooseconnect";
 import { TargetModel, TargetReactionModel } from "./models/schema";
-import Express from "express";
+import { createServer } from "./server";
 import { env } from "./env";
-import { targetRouter } from "./routes/targetRouter";
 
 mongoConnect();
 
@@ -56,7 +55,6 @@ const targetReactionSub = rabbit.createConsumer(
   },
   async (msg) => {
     const { targetReaction } = msg.body;
-    console.log(targetReaction);
     const target = await TargetModel.findById(targetReaction.targetId);
     if (target) {
       const targetReaction2 = {
@@ -92,7 +90,6 @@ const targetLikedSub = rabbit.createConsumer(
     queueBindings: [{ exchange: "target-events", routingKey: "target.liked" }],
   },
   async (msg) => {
-    console.log(msg.body);
     const target = await TargetModel.findById(msg.body.targetId);
     if (target) {
       target.likes = msg.body.likes;
@@ -120,7 +117,6 @@ const targetReactionLikedSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log(msg.body);
     const { targetReaction, likes, dislikes } = msg.body;
     const target = await TargetModel.findById(targetReaction.targetId).populate(
       "reactions"
@@ -190,6 +186,10 @@ const targetReactionDeletedSub = rabbit.createConsumer(
   }
 );
 
+targetReactionDeletedSub.on("error", (err) => {
+  console.error(err);
+});
+
 const setReactionScoreSub = rabbit.createConsumer(
   {
     queue: "targetReaction.scorecreated",
@@ -204,7 +204,6 @@ const setReactionScoreSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log(msg);
     const { targetId, responseId, score } = msg.body;
     const target = await TargetModel.findById(targetId).populate("reactions");
     if (target) {
@@ -248,14 +247,58 @@ targetUpdatedSub.on("error", (err) => {
   console.error(err);
 });
 
-const app = Express();
-app.use(Express.json()).use(Express.urlencoded({ extended: true }));
+const targetExpiredMailPub = rabbit.createPublisher({
+  exchanges: [{ exchange: "target-events", type: "topic" }],
+  confirm: true,
+  maxAttempts: 2,
+});
 
-app.use("/", targetRouter);
+const targetExpiredSub = rabbit.createConsumer(
+  {
+    queue: "target.expired",
+    queueOptions: { durable: true },
+    // handle 2 messages at a time
+    qos: { prefetchCount: 2 },
+    // Optionally ensure an exchange exists
+    exchanges: [{ exchange: "target-events", type: "topic" }],
+    // With a "topic" exchange, messages matching this pattern are routed to the queue
+    queueBindings: [
+      { exchange: "target-events", routingKey: "target.expired" },
+    ],
+  },
+  async (msg) => {
+    const target = await TargetModel.findById(msg.body.targetId);
+
+    //find all reactions from the target and get their ownerId and score
+    const reactions = target?.reactions?.map((reaction) => {
+      return { ownerId: reaction.ownerId, score: reaction.score };
+    });
+
+    if (!reactions) {
+      console.log("No reactions found");
+      return;
+    }
+
+    await targetExpiredMailPub.send(
+      { exchange: "target-events", routingKey: "target.result" },
+      {
+        reactions,
+        winner: reactions.filter((reaction) => reaction.score).sort()[0],
+      }
+    );
+  }
+);
+
+targetExpiredSub.on("error", (err) => {
+  console.error(err);
+});
 
 const port =
   new URL(env.READ_URL).port ||
   (new URL(env.READ_URL).protocol === "https:" ? "443" : "80");
-app.listen(port, () => {
+
+const server = createServer();
+
+server.listen(port, () => {
   console.log(`Read service is running on ${env.READ_URL}`);
 });

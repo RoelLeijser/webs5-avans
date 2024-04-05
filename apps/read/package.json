@@ -24,7 +24,8 @@
     "mongoose": "^8.2.4",
     "mongoose-paginate-v2": "^1.8.0",
     "rabbitmq-client": "^4.5.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@webs5/opaque-token": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",

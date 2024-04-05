@@ -6,7 +6,6 @@ export const targetRouter: Router = Router({
 });
 
 targetRouter.get("/:id", (req, res) => {
-  console.log(req.params);
   readController.getOne(req, res);
 });
 

@@ -66,7 +66,6 @@ export const readController = {
       if (error instanceof z.ZodError) {
         return res.status(400).json(error.errors);
       }
-      console.log(error);
       return res.status(500).json(error);
     }
   },
@@ -89,7 +88,6 @@ export const readController = {
       if (error instanceof z.ZodError) {
         return res.status(400).json(error.errors);
       }
-      console.log(error);
       return res.status(500).json(error);
     }
   },

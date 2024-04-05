@@ -15,3 +15,13 @@ export const RegisterSchema = z.object({
   user: UserSchema,
   verificationToken: VerificationTokenSchema,
 });
+
+const User = z.object({
+  ownerId: z.string(),
+  score: z.number(),
+});
+
+export const TargetResultSchema = z.object({
+  reactions: z.array(User.optional()),
+  winner: User.optional(),
+});

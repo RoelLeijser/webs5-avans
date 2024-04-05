@@ -9,10 +9,16 @@ const expiredPub = rabbit.createPublisher({
 });
 
 clockQueue.process(async (job, done) => {
-  console.log("Job completed", job.data.target_id);
-  await expiredPub.send("target.expired", {
-    target_id: job.data.target_id,
-  });
+  console.log("Job completed", job.data.targetId);
+  await expiredPub.send(
+    {
+      exchange: "target-events",
+      routingKey: "target.expired",
+    },
+    {
+      targetId: job.data.targetId,
+    }
+  );
   done();
 });
 
