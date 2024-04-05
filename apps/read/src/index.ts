@@ -56,7 +56,6 @@ const targetReactionSub = rabbit.createConsumer(
   },
   async (msg) => {
     const { targetReaction } = msg.body;
-    console.log(targetReaction);
     const target = await TargetModel.findById(targetReaction.targetId);
     if (target) {
       const targetReaction2 = {
@@ -92,7 +91,6 @@ const targetLikedSub = rabbit.createConsumer(
     queueBindings: [{ exchange: "target-events", routingKey: "target.liked" }],
   },
   async (msg) => {
-    console.log(msg.body);
     const target = await TargetModel.findById(msg.body.targetId);
     if (target) {
       target.likes = msg.body.likes;
@@ -120,7 +118,6 @@ const targetReactionLikedSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log(msg.body);
     const { targetReaction, likes, dislikes } = msg.body;
     const target = await TargetModel.findById(targetReaction.targetId).populate(
       "reactions"
@@ -208,7 +205,6 @@ const setReactionScoreSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log(msg);
     const { targetId, responseId, score } = msg.body;
     const target = await TargetModel.findById(targetId).populate("reactions");
     if (target) {
@@ -272,8 +268,6 @@ const targetExpiredSub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log(msg.body);
-
     const target = await TargetModel.findById(msg.body.targetId);
 
     //find all reactions from the target and get their ownerId and score
@@ -281,13 +275,16 @@ const targetExpiredSub = rabbit.createConsumer(
       return { ownerId: reaction.ownerId, score: reaction.score };
     });
 
+    if (!reactions) {
+      console.log("No reactions found");
+      return;
+    }
+
     await targetExpiredMailPub.send(
       { exchange: "target-events", routingKey: "target.result" },
       {
         reactions,
-        winner: reactions?.reduce((prev, current) => {
-          return prev.score! > current.score! ? prev : current;
-        }),
+        winner: reactions.filter((reaction) => reaction.score).sort()[0],
       }
     );
   }

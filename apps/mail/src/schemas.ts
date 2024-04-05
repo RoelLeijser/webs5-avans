@@ -17,11 +17,11 @@ export const RegisterSchema = z.object({
 });
 
 const User = z.object({
-  _id: z.string(),
-  targetId: z.string(),
+  ownerId: z.string(),
+  score: z.number(),
 });
 
 export const TargetResultSchema = z.object({
-  reactions: z.array(User),
-  winner: User,
+  reactions: z.array(User.optional()),
+  winner: User.optional(),
 });

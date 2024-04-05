@@ -3,8 +3,6 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import { authRouter } from "./routes/auth";
-import { verifyToken } from "./middleware/verifyToken";
-import { checkPermissions } from "./middleware/checkPermissions";
 
 export const createServer = (): Express => {
   const app = express();

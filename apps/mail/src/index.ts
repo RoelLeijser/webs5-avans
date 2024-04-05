@@ -1,6 +1,6 @@
 import { rabbitMQ } from "./rabbitmq";
 import { RegisterSchema, TargetResultSchema } from "./schemas";
-import { sendVerificationEmail } from "./mailService";
+import { sendVerificationEmail, sendTargetResultEmail } from "./mailService";
 import { mongoConnect } from "./mongoConnect";
 import { UserModel } from "./models/schema";
 
@@ -34,14 +34,15 @@ sub.on("error", (err: Error) => {
 
 const expiredSub = rabbitMQ.createConsumer(
   {
-    queue: "target-expired",
+    queue: "target.result",
     queueOptions: { durable: true },
     qos: { prefetchCount: 2 },
     exchanges: [{ exchange: "target.events", type: "topic" }],
     queueBindings: [{ exchange: "target-events", routingKey: "target.result" }],
   },
   async (msg) => {
-    console.log(msg.body);
+    const event = TargetResultSchema.parse(msg.body);
+    await sendTargetResultEmail(event);
   }
 );
 
