@@ -18,7 +18,8 @@ export const createServer = (): Express => {
     .get("/targets", requestWrapper(env.READ_URL))
     .get("/target/:id", requestWrapper(env.READ_URL))
     .use("/target", requestWrapper(env.TARGET_URL))
-    .use("/auth", requestWrapper(env.AUTH_URL));
+    .use("/auth", requestWrapper(env.AUTH_URL))
+    .use("/api-docs", requestWrapper(env.DOCS_URL));
 
   app.use(json());
 

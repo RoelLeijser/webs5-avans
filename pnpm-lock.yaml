@@ -173,6 +173,49 @@ importers:
         specifier: ^5.3.3
         version: 5.4.2
 
+  apps/docs:
+    dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.9.2
+        version: 0.9.2(typescript@5.4.2)(zod@3.22.4)
+      express:
+        specifier: ^4.18.2
+        version: 4.18.2
+      swagger-ui-express:
+        specifier: ^5.0.0
+        version: 5.0.0(express@4.18.2)
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.21
+      '@types/node':
+        specifier: ^20.11.19
+        version: 20.11.28
+      '@types/swagger-ui-express':
+        specifier: ^4.1.6
+        version: 4.1.6
+      '@webs5/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/config-eslint
+      '@webs5/jest-presets':
+        specifier: workspace:*
+        version: link:../../packages/jest-presets
+      '@webs5/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
+      dotenv-cli:
+        specifier: ^7.3.0
+        version: 7.4.1
+      tsup:
+        specifier: ^8.0.2
+        version: 8.0.2(typescript@5.4.2)
+      typescript:
+        specifier: ^5.3.3
+        version: 5.4.2
+
   apps/gateway:
     dependencies:
       '@t3-oss/env-core':
@@ -269,9 +312,6 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.11.19)
-      prisma:
-        specifier: ^5.10.2
-        version: 5.10.2
       supertest:
         specifier: ^6.3.4
         version: 6.3.4
@@ -4687,6 +4727,13 @@ packages:
 
   /@types/supports-color@8.1.3:
     resolution: {integrity: sha512-Hy6UMpxhE3j1tLpl27exp1XqHD7n8chAiNPzWfz16LPZoMMoSc4dzLl6w9qijkEb/r5O1ozdu1CWGA2L83ZeZg==}
+    dev: true
+
+  /@types/swagger-ui-express@4.1.6:
+    resolution: {integrity: sha512-UVSiGYXa5IzdJJG3hrc86e8KdZWLYxyEsVoUI4iPXc7CO4VZ3AfNP8d/8+hrDRIqz+HAaSMtZSqAsF3Nq2X/Dg==}
+    dependencies:
+      '@types/express': 4.17.21
+      '@types/serve-static': 1.15.5
     dev: true
 
   /@types/tough-cookie@4.0.5:
@@ -11739,6 +11786,20 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /swagger-ui-dist@5.13.0:
+    resolution: {integrity: sha512-uaWhh6j18IIs5tOX0arvIBnVINAzpTXaQXkr7qAk8zoupegJVg0UU/5+S/FgsgVCnzVsJ9d7QLjIxkswEeTg0Q==}
+    dev: false
+
+  /swagger-ui-express@5.0.0(express@4.18.2):
+    resolution: {integrity: sha512-tsU9tODVvhyfkNSvf03E6FAk+z+5cU3lXAzMy6Pv4av2Gt2xA0++fogwC4qo19XuFf6hdxevPuVCSKFuMHJhFA==}
+    engines: {node: '>= v0.10.32'}
+    peerDependencies:
+      express: '>=4.0.0 || >=5.0.0-beta'
+    dependencies:
+      express: 4.18.2
+      swagger-ui-dist: 5.13.0
+    dev: false
 
   /symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
