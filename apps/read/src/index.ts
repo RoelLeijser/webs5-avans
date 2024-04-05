@@ -1,10 +1,8 @@
 import { rabbit } from "./rabbitmq";
 import { mongoConnect } from "./mongooseconnect";
 import { TargetModel, TargetReactionModel } from "./models/schema";
-import Express from "express";
+import { createServer } from "./server";
 import { env } from "./env";
-import { targetRouter } from "./routes/targetRouter";
-import { opaqueToken } from "@webs5/opaque-token";
 
 mongoConnect();
 
@@ -295,17 +293,12 @@ targetExpiredSub.on("error", (err) => {
   console.error(err);
 });
 
-const app = Express();
-app
-  .use(Express.json())
-  .use(Express.urlencoded({ extended: true }))
-  .use(opaqueToken());
-
-app.use("/", targetRouter);
-
 const port =
   new URL(env.READ_URL).port ||
   (new URL(env.READ_URL).protocol === "https:" ? "443" : "80");
-app.listen(port, () => {
+
+const server = createServer();
+
+server.listen(port, () => {
   console.log(`Read service is running on ${env.READ_URL}`);
 });
