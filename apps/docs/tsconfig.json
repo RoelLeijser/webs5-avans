@@ -7,7 +7,7 @@
     "strict": true,
     "esModuleInterop": true,
     "target": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "strictPropertyInitialization": false,
     "resolveJsonModule": true
   },
