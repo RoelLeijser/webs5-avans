@@ -32,7 +32,8 @@
     "rabbitmq-client": "^4.5.1",
     "rate-limit-redis": "^4.2.0",
     "redis": "^4.6.13",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@webs5/opaque-token": "workspace:*"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",

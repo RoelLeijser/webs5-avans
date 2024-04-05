@@ -8,6 +8,8 @@ export const env = createEnv({
     TARGET_URL: z.string().url(),
     DOCS_URL: z.string().url(),
     JWT_SECRET: z.string(),
+    READ_URL: z.string().url(),
+    OPAQUE_TOKEN: z.string(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),

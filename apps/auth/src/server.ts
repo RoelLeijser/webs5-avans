@@ -3,8 +3,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import { authRouter } from "./routes/auth";
-import { verifyToken } from "./middleware/verifyToken";
-import { checkPermissions } from "./middleware/checkPermissions";
+import { opaqueToken } from "@webs5/opaque-token";
 
 export const createServer = (): Express => {
   const app = express();
@@ -14,7 +13,8 @@ export const createServer = (): Express => {
     .use(urlencoded({ extended: true }))
     .use(json())
     .use(cors())
-    .use(cookieParser());
+    .use(cookieParser())
+    .use(opaqueToken());
 
   app.use("/", authRouter);
   app.all("*", (req, res) => {

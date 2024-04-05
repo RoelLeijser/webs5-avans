@@ -16,8 +16,8 @@ const CreateTargetRequestSchema = z.object({
   params: z.object({
     targetId: z.string(),
   }),
-  body: z.object({
-    ownerId: z.string(),
+  user: z.object({
+    id: z.string(),
   }),
   file: z.object({
     buffer: z.instanceof(Buffer),
@@ -35,8 +35,10 @@ const LikeTargetReactionRequestSchema = z.object({
     targetId: z.string(),
   }),
   body: z.object({
-    userId: z.string(),
     liked: z.boolean().nullable(),
+  }),
+  user: z.object({
+    id: z.string(),
   }),
 });
 
@@ -51,7 +53,7 @@ const s3 = new S3Client({
 export const targetReactionController = {
   create: async (req: Request, res: Response) => {
     try {
-      const { params, body, file } = CreateTargetRequestSchema.parse(req);
+      const { params, user, file } = CreateTargetRequestSchema.parse(req);
 
       const target = await prisma.target.findUnique({
         where: { id: params.targetId },
@@ -79,7 +81,7 @@ export const targetReactionController = {
       const targetReaction = await prisma.targetReaction.create({
         data: {
           Target: { connect: { id: params.targetId } },
-          ownerId: body.ownerId,
+          ownerId: user.id,
           imageKey: key,
           imageUrl: `${env.CLOUDFRONT_URL}/${key}`,
         },
@@ -156,7 +158,7 @@ export const targetReactionController = {
   },
   like: async (req: Request, res: Response) => {
     try {
-      const { params, body } = LikeTargetReactionRequestSchema.parse(req);
+      const { params, body, user } = LikeTargetReactionRequestSchema.parse(req);
 
       const targetReaction = await prisma.targetReaction.findUnique({
         where: { id: params.id },
@@ -168,7 +170,7 @@ export const targetReactionController = {
 
       const like = await prisma.like.findFirst({
         where: {
-          userId: body.userId,
+          userId: user.id,
           targetReactionId: params.id,
         },
       });
@@ -184,7 +186,7 @@ export const targetReactionController = {
       if (body.liked === null) {
         await prisma.like.deleteMany({
           where: {
-            userId: body.userId,
+            userId: user.id,
             targetReactionId: params.id,
           },
         });
@@ -192,19 +194,41 @@ export const targetReactionController = {
         await prisma.like.create({
           data: {
             TargetReaction: { connect: { id: params.id } },
-            userId: body.userId,
+            userId: user.id,
             liked: body.liked,
           },
         });
       }
+
+      const likes = await prisma.like.count({
+        where: {
+          targetReactionId: params.id,
+          liked: true,
+        },
+      });
+      const dislikes = await prisma.like.count({
+        where: {
+          targetReactionId: params.id,
+          liked: false,
+        },
+      });
+      await pub.send(
+        {
+          exchange: "target-events",
+          routingKey: "targetReaction.liked",
+        },
+        {
+          targetReaction,
+          likes,
+          dislikes,
+        }
+      );
 
       return res.json({ message: "Success" });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: error.errors });
       } else {
-        console.log(error);
-
         return res.status(500).json({ error });
       }
     }

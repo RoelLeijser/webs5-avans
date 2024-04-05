@@ -4,8 +4,13 @@
     "lib": ["ES2015"],
     "module": "ES2015",
     "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "Bundler",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false
   },
   "exclude": ["node_modules"],
   "include": ["."]
