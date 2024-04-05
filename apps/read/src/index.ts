@@ -4,6 +4,7 @@ import { TargetModel, TargetReactionModel } from "./models/schema";
 import Express from "express";
 import { env } from "./env";
 import { targetRouter } from "./routes/targetRouter";
+import { opaqueToken } from "@webs5/opaque-token";
 
 mongoConnect();
 
@@ -295,7 +296,10 @@ targetExpiredSub.on("error", (err) => {
 });
 
 const app = Express();
-app.use(Express.json()).use(Express.urlencoded({ extended: true }));
+app
+  .use(Express.json())
+  .use(Express.urlencoded({ extended: true }))
+  .use(opaqueToken());
 
 app.use("/", targetRouter);
 

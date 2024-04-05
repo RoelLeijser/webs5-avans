@@ -26,6 +26,9 @@ const proxyHandler = (
         [`^/target`]: "",
         [`^/auth`]: "",
       },
+      onProxyReq: (proxyReq) => {
+        proxyReq.setHeader("Authorization", env.OPAQUE_TOKEN);
+      },
       onError: (err) => {
         reject(err);
       },

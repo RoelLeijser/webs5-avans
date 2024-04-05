@@ -6,7 +6,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { targetRouter } from "./routes/targetRouter";
 import { targetReactionRouter } from "./routes/targetReaction";
-import { appendJwtUser } from "./middleware/appendJwtUser";
+import { opaqueToken } from "@webs5/opaque-token";
 
 const app = express();
 app
@@ -16,7 +16,7 @@ app
   .use(json())
   .use(cors())
   .use(cookieParser())
-  .use(appendJwtUser());
+  .use(opaqueToken());
 
 app.use(targetRouter);
 app.use("/:targetId/", targetReactionRouter);

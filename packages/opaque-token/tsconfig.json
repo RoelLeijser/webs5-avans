@@ -1,0 +1,9 @@
+{
+  "extends": "@webs5/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2015"],
+    "outDir": "./dist"
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
+}
